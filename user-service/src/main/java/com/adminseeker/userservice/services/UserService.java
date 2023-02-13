@@ -12,7 +12,10 @@ import com.adminseeker.userservice.repository.UserRepo;
 
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 @Service
+@Transactional
 public class UserService {
     
     @Autowired
@@ -23,6 +26,8 @@ public class UserService {
         User userdb = repo.findByEmail(user.getEmail()).orElse(null); 
         
         if(userdb!=null) throw new DuplicateEmailException("Email Already Exists!");
+
+        if(!user.getRole().equals("buyer") && !user.getRole().equals("seller")) throw new ResourceUpdateError("Invalid User Role!");
 
         return repo.save(user);
     }
@@ -42,11 +47,11 @@ public class UserService {
         User userdb = repo.findById(id).orElseThrow(()->new ResourceNotFound("User Not Found!"));
         
         if(user.getEmail()!=null){
-            throw new ResourceUpdateError("Email Change Is No Allowed!");
+            throw new ResourceUpdateError("Email Change Is Not Allowed!");
         }
 
         if(user.getRole()!=null){
-            throw new ResourceUpdateError("Role Change Is No Allowed!");
+            throw new ResourceUpdateError("Role Change Is Not Allowed!");
         }
 
         if(user.getName()==null && user.getPassword()==null && user.getPhone()==null) throw new Exception("Nothing to update!");

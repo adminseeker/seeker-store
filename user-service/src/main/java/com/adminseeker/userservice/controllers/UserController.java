@@ -40,12 +40,12 @@ public class UserController {
         }
     }
 
-    @GetMapping("/users")
+    @GetMapping("")
     public ResponseEntity<?> getAll(){
         return new ResponseEntity<List<User>>(userService.getUsers(),HttpStatus.OK);
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id){
         try {
             User user = userService.getUserById(id); 
@@ -56,8 +56,8 @@ public class UserController {
         }
     }
 
-    @PatchMapping("/users/{id}")
-    public ResponseEntity<?> updateUser(@RequestBody User user, @PathVariable Long id){
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateById(@RequestBody User user, @PathVariable Long id){
         try{
             User usrdb = userService.updateUserById(user, id);
             return new ResponseEntity<User>(usrdb,HttpStatus.OK);
@@ -69,8 +69,8 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/users/{id}")
-    public ResponseEntity<?> DeleteUser(@PathVariable Long id){
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> DeleteById(@PathVariable Long id){
         try {
             User user = userService.DeleteUserById(id); 
             return new ResponseEntity<User>(user,HttpStatus.OK);

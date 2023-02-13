@@ -38,6 +38,10 @@ public class Address {
     @NotEmpty(message = "Empty value not allowed!")
     private String state;
 
+    @Column(name="city")
+    @NotEmpty(message = "Empty value not allowed!")
+    private String city;
+
     @Column(name="street")
     @NotEmpty(message = "Empty value not allowed!")
     private String street;

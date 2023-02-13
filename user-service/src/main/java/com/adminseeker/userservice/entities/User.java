@@ -52,7 +52,7 @@ public class User {
     @NotEmpty(message = "Empty value not allowed!")
     private String role;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(orphanRemoval = true,cascade = CascadeType.ALL)
     private List<Address> addressList;
 
     @CreationTimestamp
