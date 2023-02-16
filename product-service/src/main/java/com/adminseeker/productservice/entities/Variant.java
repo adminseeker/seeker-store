@@ -1,0 +1,37 @@
+package com.adminseeker.productservice.entities;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
+
+import lombok.Data;
+
+@Data
+@Entity
+@Table(name="t_variants_list")
+public class Variant {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="variant_id")
+    private Long variantId;
+
+    @Column(name="variant_skucode")
+    @NotEmpty(message = "Empty value not allowed!")
+    private String variantSkucode;
+
+    @Column(name="color")
+    private String color;
+
+    @Column(name="type")
+    private String type;
+
+    @Column(name="size")
+    private String size;
+
+
+}
