@@ -29,7 +29,7 @@ public class ProductService {
     UserServiceRequest userServiceRequest;
 
     public Product addProduct(Product product){
-        User user = userServiceRequest.getUserById(product.getUserId()).orElseThrow(()-> new ResourceNotFound("Seller Not Found!"));
+        User user = userServiceRequest.getUserById(product.getSellerId()).orElseThrow(()-> new ResourceNotFound("Seller Not Found!"));
         product.setSkucode(product.getSkucode().toUpperCase());
         Product check = repo.findBySkucode(product.getSkucode()).orElse(null); 
         if(!user.getRole().equals("seller")) throw new ResourceUpdateError("Not a Seller!");
@@ -54,7 +54,7 @@ public class ProductService {
 
     public ProductResponse getProductById(Long id){
         Product product = repo.findById(id).orElseThrow(()-> new ResourceNotFound("Product Not Found!"));
-        User seller = userServiceRequest.getUserById(product.getUserId()).orElseThrow(()-> new ResourceNotFound("Seller Not Found!"));
+        User seller = userServiceRequest.getUserById(product.getSellerId()).orElseThrow(()-> new ResourceNotFound("Seller Not Found!"));
         ProductResponse productResponse = new ProductResponse();
         productResponse.setProduct(product);
         productResponse.setSeller(seller);
@@ -63,7 +63,7 @@ public class ProductService {
 
     public ProductResponse getProductBySkucode(String skucode){
         Product product = repo.findBySkucode(skucode.toUpperCase()).orElseThrow(()-> new ResourceNotFound("Product Not Found!"));
-        User seller = userServiceRequest.getUserById(product.getUserId()).orElseThrow(()-> new ResourceNotFound("Seller Not Found!"));
+        User seller = userServiceRequest.getUserById(product.getSellerId()).orElseThrow(()-> new ResourceNotFound("Seller Not Found!"));
         ProductResponse productResponse = new ProductResponse();
         productResponse.setProduct(product);
         productResponse.setSeller(seller);
@@ -71,10 +71,10 @@ public class ProductService {
     }
 
     public Product updateProductById(Product product,Long productId) throws Exception{
-        User user = userServiceRequest.getUserById(product.getUserId()).orElseThrow(()-> new ResourceNotFound("Seller Not Found!"));
+        User user = userServiceRequest.getUserById(product.getSellerId()).orElseThrow(()-> new ResourceNotFound("Seller Not Found!"));
         if(!user.getRole().equals("seller")) throw new ResourceUpdateError("Not a Seller!");
         Product productdb = repo.findById(productId).orElseThrow(()->new ResourceNotFound("Product Not Found!"));
-        if (!product.getUserId().equals(productdb.getUserId())) throw new ResourceUpdateError("Unauthorised User!");
+        if (!product.getSellerId().equals(productdb.getSellerId())) throw new ResourceUpdateError("Unauthorised User!");
         if(product.getSkucode()!=null){
             product.setSkucode(product.getSkucode().toUpperCase());
             Product check = repo.findBySkucode(product.getSkucode()).orElse(null);
@@ -120,7 +120,7 @@ public class ProductService {
         if(!user.getRole().equals("seller")) throw new ResourceUpdateError("Not a Seller!");
 
         Product product = repo.findById(productId).orElseThrow(()-> new ResourceNotFound("Product Not Found!"));
-        if (!productRequest.getUserId().equals(product.getUserId())) throw new ResourceUpdateError("Unauthorised User!");
+        if (!productRequest.getUserId().equals(product.getSellerId())) throw new ResourceUpdateError("Unauthorised User!");
         repo.delete(product);
         return product;        
     }

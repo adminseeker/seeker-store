@@ -1,4 +1,4 @@
-package com.adminseeker.productservice.entities;
+package com.adminseeker.inventoryservice.entities;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,29 +21,21 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name="t_products")
-public class Product {
+@Table(name="t_inventory")
+public class Inventory {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="product_id")
-    private Long productId;
-
-    @Column(name="name")
-    @NotEmpty(message = "Empty value not allowed!")
-    private String name;
-
-    @Column(name="description")
-    @NotEmpty(message = "Empty value not allowed!")
-    private String description;
+    @Column(name="inventory_id")
+    private Long inventoryId;
 
     @Column(name="skucode")
     @NotEmpty(message = "Empty value not allowed!")
     private String skucode;
 
-    @Column(name="price")
+    @Column(name="quantity")
     @NotNull(message = "Empty value not allowed!")
-    private Double price;
+    private Integer quantity;
     
     @Column(name="seller_id")
     @NotNull(message = "Empty value not allowed!")
