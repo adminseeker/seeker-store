@@ -38,20 +38,7 @@ public class InventoryService {
         if(productresponse.getProduct().getVariants()==null && inventory.getVariants().size()!=0) throw new ResourceNotFound("Product Has No Variants!");
         Inventory check = repo.findBySkucode(inventory.getSkucode()).orElse(null); 
         if(check!=null) throw new DuplicateResourceException("Product Skucode Already Exists!");
-        List<Variant> variants = inventory.getVariants();
-        String previousVal=null;
-        Integer variantsCount = 1;
-        if(variants!=null){
-            for(Variant v: variants){
-                v.setVariantId(variantsCount);
-                v.setVariantSkucode(v.getVariantSkucode().toUpperCase());
-                if(v.getVariantSkucode().equals(previousVal)){
-                    throw new DuplicateResourceException("Duplicate Variant Skucode Entry!");
-                }
-                previousVal=v.getVariantSkucode();
-                variantsCount++;
-            }
-        }
+        
         return repo.save(inventory);
     }
 
@@ -85,21 +72,7 @@ public class InventoryService {
         return quantityResponse;
     }
 
-    public QuantityResponse getProductVariantQuantityBySkucode(String skucode, String variantSkucode){
-        Inventory inventory = repo.findBySkucode(skucode.toUpperCase()).orElseThrow(()-> new ResourceNotFound("Inventory Not Found!"));
-        productServiceRequest.getProductBySkucode(inventory.getSkucode()).orElseThrow(()-> new ResourceNotFound("Product Not Found!"));
-        QuantityResponse quantityResponse = new QuantityResponse();
-        if(inventory.getVariants().size()!=0){
-            List<Variant> variants = inventory.getVariants();
-            for(Variant v: variants){
-                if(v.getVariantSkucode().equals(variantSkucode)){
-                    quantityResponse.setQuantity(v.getQuantity());
-                }
-            } 
-        }      
-        if(quantityResponse.getQuantity()==null) throw new ResourceNotFound("Variant Not Found!");
-        return quantityResponse;
-    }
+    
 
     public Inventory updateInventoryById(Inventory inventory,Long inventoryId) throws Exception{
         Inventory inventorydb = repo.findById(inventoryId).orElseThrow(()->new ResourceNotFound("Inventory Not Found!"));
@@ -110,7 +83,7 @@ public class InventoryService {
             Inventory check = repo.findBySkucode(inventory.getSkucode()).orElse(null);
             if(check!=null) throw new DuplicateResourceException("Product Skucode Already Exists!");
         }
-        if(inventory.getSkucode()==null && inventory.getQuantity()==null && inventory.getVariants()==null) throw new Exception("Nothing to update!");
+        if(inventory.getSkucode()==null && inventory.getQuantity()==null) throw new Exception("Nothing to update!");
         
         if(inventory.getSkucode()!=null){
             inventorydb.setSkucode(inventory.getSkucode());
@@ -119,28 +92,7 @@ public class InventoryService {
         if(inventory.getQuantity()!=null){
             inventorydb.setQuantity(inventory.getQuantity());
         }
-        if(productResponse.getProduct().getVariants()==null && inventory.getVariants().size()!=0) throw new ResourceNotFound("Product Has No Variants!");
-
-        if(inventory.getVariants()!=null){
-            List<Variant> variants = inventory.getVariants();
-            String previousVal=null;
-            Integer variantsCount = 1;
-
-            if(variants!=null){
-                for(Variant v: variants){
-                    v.setVariantId(variantsCount);
-                    v.setVariantSkucode(v.getVariantSkucode().toUpperCase());
-                    if(v.getVariantSkucode().equals(previousVal)){
-                        throw new DuplicateResourceException("Duplicate Variant Skucode Entry!");
-                    }
-                    previousVal=v.getVariantSkucode();
-                    variantsCount++;
-                }
-    
-            }
-            inventorydb.getVariants().clear();
-            inventorydb.getVariants().addAll(inventory.getVariants());
-        }
+        // if(productResponse.getProduct().getVariants()==null && inventory.getVariants().size()!=0) throw new ResourceNotFound("Product Has No Variants!");
 
         return repo.save(inventorydb);
     }

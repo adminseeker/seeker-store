@@ -9,33 +9,32 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.adminseeker.inventoryservice.entities.Variant;
+import com.adminseeker.inventoryservice.entities.VariantRequest;
 import com.adminseeker.inventoryservice.entities.ErrorResponse;
-import com.adminseeker.inventoryservice.entities.Inventory;
-import com.adminseeker.inventoryservice.entities.InventoryRequest;
-import com.adminseeker.inventoryservice.entities.InventoryResponse;
 import com.adminseeker.inventoryservice.entities.QuantityResponse;
-import com.adminseeker.inventoryservice.services.InventoryService;
+import com.adminseeker.inventoryservice.services.VariantService;
 
 
 @CrossOrigin(maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/inventory")
-public class InventoryController {
+public class VariantController {
     
     @Autowired
-    InventoryService inventoryService;
+    VariantService variantService;
 
-    @PostMapping("")
-    public ResponseEntity<?> save(@RequestBody Inventory inventory){
+    @PostMapping("/{inventoryId}/variant")
+    public ResponseEntity<?> save(@RequestBody VariantRequest variantrequest, @PathVariable Long inventoryId){
         try {
-        return new ResponseEntity<Inventory>(inventoryService.addInventory(inventory),HttpStatus.CREATED);
+        return new ResponseEntity<Variant>(variantService.addVariant(inventoryId, variantrequest),HttpStatus.CREATED);
             
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
@@ -43,37 +42,31 @@ public class InventoryController {
         }
     }
 
-    @GetMapping("")
-    public ResponseEntity<?> getAll(){
-        return new ResponseEntity<List<Inventory>>(inventoryService.getInventory(),HttpStatus.OK);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getInventoryById(@PathVariable Long id){
+    @GetMapping("/{inventoryId}/variant")
+    public ResponseEntity<?> getAll(@PathVariable Long inventoryId){
         try {
-            InventoryResponse inventoryResponse = inventoryService.getInventoryById(id); 
-            return new ResponseEntity<InventoryResponse>(inventoryResponse,HttpStatus.OK);
+            return new ResponseEntity<List<Variant>>(variantService.getVariants(inventoryId),HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
             return new ResponseEntity<ErrorResponse>(err,HttpStatus.NOT_FOUND);
         }
     }
 
-    @GetMapping("/skucode/{skucode}")
-    public ResponseEntity<?> getInventoryBySkuCode(@PathVariable String skucode){
+    @GetMapping("/{inventoryId}/variant/{variantId}")
+    public ResponseEntity<?> getById(@PathVariable Long inventoryId, @PathVariable Long variantId){
         try {
-            InventoryResponse inventoryResponse = inventoryService.getInventoryBySkucode(skucode); 
-            return new ResponseEntity<InventoryResponse>(inventoryResponse,HttpStatus.OK);
+            Variant variant = variantService.getVariantById(inventoryId, variantId); 
+            return new ResponseEntity<Variant>(variant,HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
             return new ResponseEntity<ErrorResponse>(err,HttpStatus.NOT_FOUND);
         }
     }
 
-    @GetMapping("/skucode/{skucode}/quantity")
-    public ResponseEntity<?> getProductQuantityBySkuCode(@PathVariable String skucode){
+    @GetMapping("/skucode/{skucode}/variant/{variantSkucode}/quantity")
+    public ResponseEntity<?> getProductVariantQuantityBySkuCode(@PathVariable String skucode, @PathVariable String variantSkucode){
         try {
-            QuantityResponse quantityResponse = inventoryService.getProductQuantityBySkucode(skucode); 
+            QuantityResponse quantityResponse = variantService.getProductVariantQuantityBySkucode(skucode,variantSkucode); 
             return new ResponseEntity<QuantityResponse>(quantityResponse,HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
@@ -81,13 +74,11 @@ public class InventoryController {
         }
     }
 
-    
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<?> updateById(@RequestBody Inventory inventory, @PathVariable Long id){
+    @PutMapping("/{inventoryId}/variant/{variantId}")
+    public ResponseEntity<?> updateById(@RequestBody VariantRequest variantrequest, @PathVariable Long inventoryId, @PathVariable Long variantId){
         try{
-            Inventory inventoryDb = inventoryService.updateInventoryById(inventory, id);
-            return new ResponseEntity<Inventory>(inventoryDb,HttpStatus.OK);
+            Variant variantResult = variantService.UpdateVariantById(inventoryId, variantrequest, variantId);
+            return new ResponseEntity<Variant>(variantResult,HttpStatus.OK);
         }
         catch(Exception e){
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
@@ -96,11 +87,11 @@ public class InventoryController {
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> DeleteById(@PathVariable Long id, @RequestBody InventoryRequest inventoryRequest){
+    @DeleteMapping("/{inventoryId}/variant/{variantId}")
+    public ResponseEntity<?> DeleteById(@PathVariable Long inventoryId, @PathVariable Long variantId, @RequestBody VariantRequest variantrequest){
         try {
-            Inventory inventory = inventoryService.DeleteInventoryById(id,inventoryRequest); 
-            return new ResponseEntity<Inventory>(inventory,HttpStatus.OK);
+            Variant variant = variantService.deleteVariantById(inventoryId, variantId, variantrequest);
+            return new ResponseEntity<Variant>(variant,HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
             return new ResponseEntity<ErrorResponse>(err,HttpStatus.NOT_FOUND);

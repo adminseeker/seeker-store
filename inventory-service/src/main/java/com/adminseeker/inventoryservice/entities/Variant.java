@@ -17,8 +17,9 @@ import lombok.Data;
 public class Variant {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="variant_id")
-    private Integer variantId;
+    private Long variantId;
 
     @Column(name="variant_skucode")
     @NotEmpty(message = "Empty value not allowed!")

@@ -8,6 +8,7 @@ import com.adminseeker.productservice.entities.Product;
 import com.adminseeker.productservice.entities.ProductRequest;
 import com.adminseeker.productservice.entities.ProductResponse;
 import com.adminseeker.productservice.entities.Variant;
+import com.adminseeker.productservice.entities.VariantRequest;
 import com.adminseeker.productservice.exceptions.DuplicateResourceException;
 import com.adminseeker.productservice.exceptions.ResourceNotFound;
 import com.adminseeker.productservice.exceptions.ResourceUpdateError;
@@ -34,17 +35,6 @@ public class ProductService {
         Product check = repo.findBySkucode(product.getSkucode()).orElse(null); 
         if(!user.getRole().equals("seller")) throw new ResourceUpdateError("Not a Seller!");
         if(check!=null) throw new DuplicateResourceException("Product Skucode Already Exists!");
-        List<Variant> variants = product.getVariants();
-        String previousVal=null;
-        if(variants!=null){
-            for(Variant v: variants){
-                v.setVariantSkucode(v.getVariantSkucode().toUpperCase());
-                if(v.getVariantSkucode().equals(previousVal)){
-                    throw new DuplicateResourceException("Duplicate Variant Skucode Entry!");
-                }
-                previousVal=v.getVariantSkucode();
-            }
-        }
         return repo.save(product);
     }
 
@@ -80,7 +70,7 @@ public class ProductService {
             Product check = repo.findBySkucode(product.getSkucode()).orElse(null);
             if(check!=null) throw new DuplicateResourceException("Product Skucode Already Exists!");
         }
-        if(product.getName()==null && product.getDescription()==null && product.getPrice()==null && product.getVariants()==null) throw new Exception("Nothing to update!");
+        if(product.getName()==null && product.getDescription()==null && product.getPrice()==null) throw new Exception("Nothing to update!");
         
         if(product.getName()!=null){
             productdb.setName(product.getName());
@@ -93,27 +83,10 @@ public class ProductService {
         if(product.getPrice()!=null){
             productdb.setPrice(product.getPrice());
         }
-
-        if(product.getVariants()!=null){
-            List<Variant> variants = product.getVariants();
-            String previousVal=null;
-
-            if(variants!=null){
-                for(Variant v: variants){
-                    v.setVariantSkucode(v.getVariantSkucode().toUpperCase());
-                    if(v.getVariantSkucode().equals(previousVal)){
-                        throw new DuplicateResourceException("Duplicate Variant Skucode Entry!");
-                    }
-                    previousVal=v.getVariantSkucode();
-                }
-    
-            }
-            productdb.getVariants().clear();
-            productdb.getVariants().addAll(product.getVariants());
-        }
-
         return repo.save(productdb);
     }
+
+    
 
     public Product DeleteProductById(Long productId,ProductRequest productRequest){
         User user = userServiceRequest.getUserById(productRequest.getUserId()).orElseThrow(()-> new ResourceNotFound("Seller Not Found!"));
