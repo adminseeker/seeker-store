@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 
@@ -33,5 +34,9 @@ public class Variant {
     @Column(name="size")
     private String size;
 
+    @Column(name="price")
+    @NotNull(message = "Empty value not allowed!")
+    private Double price;
+    
 
 }

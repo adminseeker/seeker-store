@@ -8,7 +8,6 @@ import com.adminseeker.inventoryservice.entities.Inventory;
 import com.adminseeker.inventoryservice.entities.InventoryRequest;
 import com.adminseeker.inventoryservice.entities.InventoryResponse;
 import com.adminseeker.inventoryservice.entities.QuantityResponse;
-import com.adminseeker.inventoryservice.entities.Variant;
 import com.adminseeker.inventoryservice.exceptions.DuplicateResourceException;
 import com.adminseeker.inventoryservice.exceptions.ResourceNotFound;
 import com.adminseeker.inventoryservice.exceptions.ResourceUpdateError;
@@ -92,7 +91,6 @@ public class InventoryService {
         if(inventory.getQuantity()!=null){
             inventorydb.setQuantity(inventory.getQuantity());
         }
-        // if(productResponse.getProduct().getVariants()==null && inventory.getVariants().size()!=0) throw new ResourceNotFound("Product Has No Variants!");
 
         return repo.save(inventorydb);
     }

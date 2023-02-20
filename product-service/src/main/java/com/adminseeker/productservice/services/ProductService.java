@@ -7,8 +7,6 @@ import org.springframework.stereotype.Service;
 import com.adminseeker.productservice.entities.Product;
 import com.adminseeker.productservice.entities.ProductRequest;
 import com.adminseeker.productservice.entities.ProductResponse;
-import com.adminseeker.productservice.entities.Variant;
-import com.adminseeker.productservice.entities.VariantRequest;
 import com.adminseeker.productservice.exceptions.DuplicateResourceException;
 import com.adminseeker.productservice.exceptions.ResourceNotFound;
 import com.adminseeker.productservice.exceptions.ResourceUpdateError;
