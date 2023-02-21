@@ -46,14 +46,18 @@ public class CartService {
         if(userId!=cartdb.getUserId()) throw new ResourceUpdateError("Unauthorised User!");
         ProductResponse productResponse = productServiceRequest.getProductById(item.getProductId()).orElseThrow(()->new ResourceNotFound("Product Not Found!"));
         Variant variantResponse = null;
+        Boolean isVariantPresent=false;
         if(productResponse.getProduct().getVariants()!=null){
             for(Variant v : productResponse.getProduct().getVariants()){
                 if(v.getVariantId()==item.getVariantId()){
                     variantResponse=v;
+                    isVariantPresent=true;
                     break;
                 }
             }
         }
+        if((productResponse.getProduct().getVariants()!=null && productResponse.getProduct().getVariants().size()!=0) && (item.getVariantId()==null || !isVariantPresent)) throw new ResourceUpdateError("Incorrect Variant!");
+        if (item.getVariantId()!=null && !isVariantPresent) throw new ResourceNotFound("Variant Not Found!");
         QuantityResponse quantityResponse = null;
         if(variantResponse!=null){
             quantityResponse=inventoryServiceRequest.getVariantQuantityBySkucode(productResponse.getProduct().getSkucode(), variantResponse.getVariantSkucode()).orElseThrow(()->new ResourceNotFound("Variant Not Found"));
@@ -69,6 +73,18 @@ public class CartService {
             items = cartdb.getItems();
         }
         item.setItemId(ObjectId.get().toString());
+
+        Boolean isItemPresent=false;
+        for(Item i : items){
+            if(i.getProductId().equals(item.getProductId()) && isVariantPresent && i.getVariantId().equals(item.getVariantId())){
+                isItemPresent=true;
+                break;
+            } else if (!isVariantPresent && i.getProductId().equals(item.getProductId())){
+                isItemPresent=true;
+                break;
+            }
+        }
+        if(isItemPresent) throw new ResourceUpdateError("Item Already Exists In The Cart!");
         items.add(item);
         cartdb.setItems(items);
         return repo.save(cartdb);
@@ -82,14 +98,18 @@ public class CartService {
         if(userId!=cartdb.getUserId()) throw new ResourceUpdateError("Unauthorised User!");
         ProductResponse productResponse = productServiceRequest.getProductById(item.getProductId()).orElseThrow(()->new ResourceNotFound("Product Not Found!"));
         Variant variantResponse = null;
+        Boolean isVariantPresent=false;
         if(productResponse.getProduct().getVariants()!=null){
             for(Variant v : productResponse.getProduct().getVariants()){
                 if(v.getVariantId()==item.getVariantId()){
                     variantResponse=v;
+                    isVariantPresent=true;
                     break;
                 }
             }
         }
+        if((productResponse.getProduct().getVariants()!=null && productResponse.getProduct().getVariants().size()!=0) && (item.getVariantId()==null || !isVariantPresent)) throw new ResourceUpdateError("Incorrect Variant!");
+        if (item.getVariantId()!=null && !isVariantPresent) throw new ResourceNotFound("Variant Not Found!");
         QuantityResponse quantityResponse = null;
         if(variantResponse!=null){
             quantityResponse=inventoryServiceRequest.getVariantQuantityBySkucode(productResponse.getProduct().getSkucode(), variantResponse.getVariantSkucode()).orElseThrow(()->new ResourceNotFound("Variant Not Found"));
@@ -99,6 +119,19 @@ public class CartService {
         }
         if(item.getQuantity()>quantityResponse.getQuantity()) throw new ResourceUpdateError("Out of Stock!");
         List<Item> items = cartdb.getItems();
+        
+        Boolean isItemPresent=false;
+        for(Item i : items){
+            if(i.getProductId().equals(item.getProductId()) && isVariantPresent && i.getVariantId().equals(item.getVariantId()) && !i.getItemId().equals(itemId)){
+                isItemPresent=true;
+                break;
+            } else if (!isVariantPresent && i.getProductId().equals(item.getProductId()) && !i.getItemId().equals(itemId)){
+                isItemPresent=true;
+                break;
+            }
+        }
+        if(isItemPresent) throw new ResourceUpdateError("Item Already Exists In The Cart!");
+        
         Boolean isPresent=false;
         for(Item i : items){
             if(i.getItemId().equals(itemId)){
