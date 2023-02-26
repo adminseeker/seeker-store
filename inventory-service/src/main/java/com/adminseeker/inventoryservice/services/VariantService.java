@@ -104,6 +104,33 @@ public class VariantService {
         return variant;
     }
 
+    public Variant UpdateVariantQuantityBySkucode(String skucode,QuantityResponse quantityResponse,String variantSkucode){
+        Inventory inventorydb = repo.findBySkucode(skucode).orElseThrow(()->new ResourceNotFound("Inventory Not Found!"));
+
+        List<Variant> variantsdb = inventorydb.getVariants();
+        if(variantSkucode==null) throw new ResourceUpdateError("Nothing to update!");
+        ProductResponse productResponse = productServiceRequest.getProductBySkucode(inventorydb.getSkucode()).orElseThrow(()-> new ResourceNotFound("Product Not Found!"));
+        if(productResponse.getProduct().getVariants()==null ) throw new ResourceNotFound("Product Has No Variants!");
+
+        Boolean isPresent=false;
+        Variant variant=null;
+        for (Variant v : variantsdb){
+            if(v.getVariantSkucode().equals(variantSkucode)){
+                Integer index = variantsdb.indexOf(v);
+                v.setQuantity(quantityResponse.getQuantity());
+                variantsdb.set(index, v);
+                variant=v;
+                isPresent=true;
+                break;
+            }             
+        }        
+        if (!isPresent) throw new ResourceNotFound("Variant Not Found!");
+        inventorydb.setVariants(variantsdb);
+        repo.save(inventorydb);
+        return variant;
+    }
+
+
     public Variant deleteVariantById(Long inventoryId,Long variantId,VariantRequest variantRequest){
         Long userId=variantRequest.getUserId();
         Inventory inventorydb = repo.findById(inventoryId).orElseThrow(()->new ResourceNotFound("Inventory Not Found!"));

@@ -95,6 +95,17 @@ public class InventoryService {
         return repo.save(inventorydb);
     }
 
+    public Inventory updateInventoryQuantityBySkuCode(QuantityResponse quantityResponse,String skucode) throws Exception{
+        Inventory inventorydb = repo.findBySkucode(skucode).orElseThrow(()->new ResourceNotFound("Inventory Not Found!"));
+        productServiceRequest.getProductBySkucode(inventorydb.getSkucode()).orElseThrow(()-> new ResourceNotFound("Product Not Found!"));
+
+        if(quantityResponse.getQuantity()!=null){
+            inventorydb.setQuantity(quantityResponse.getQuantity());
+        }
+
+        return repo.save(inventorydb);
+    }
+
     public Inventory DeleteInventoryById(Long inventoryId,InventoryRequest inventoryRequest){
 
         Inventory inventory = repo.findById(inventoryId).orElseThrow(()-> new ResourceNotFound("Inventory Not Found!"));

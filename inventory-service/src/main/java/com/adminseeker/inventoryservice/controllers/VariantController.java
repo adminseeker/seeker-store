@@ -87,6 +87,17 @@ public class VariantController {
         }
     }
 
+    @PutMapping("/skucode/{skucode}/variant/{variantSkucode}/quantity")
+    public ResponseEntity<?> updateProductVariantQuantityBySkuCode(@PathVariable String skucode, @PathVariable String variantSkucode,@RequestBody QuantityResponse quanityResponse){
+        try {
+            Variant variant = variantService.UpdateVariantQuantityBySkucode(skucode, quanityResponse, variantSkucode);
+            return new ResponseEntity<Variant>(variant,HttpStatus.OK);
+        } catch (Exception e) {
+            ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
+            return new ResponseEntity<ErrorResponse>(err,HttpStatus.NOT_FOUND);
+        }
+    }
+
     @DeleteMapping("/{inventoryId}/variant/{variantId}")
     public ResponseEntity<?> DeleteById(@PathVariable Long inventoryId, @PathVariable Long variantId, @RequestBody VariantRequest variantrequest){
         try {

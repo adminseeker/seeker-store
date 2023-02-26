@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -93,6 +94,17 @@ public class InventoryController {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
             return new ResponseEntity<ErrorResponse>(err,HttpStatus.BAD_REQUEST);
 
+        }
+    }
+
+    @PutMapping("/skucode/{skucode}/quantity")
+    public ResponseEntity<?> updateProductQuantityBySkuCode(@PathVariable String skucode, @RequestBody QuantityResponse quantityResponse){
+        try {
+            Inventory inventory = inventoryService.updateInventoryQuantityBySkuCode(quantityResponse,skucode);
+            return new ResponseEntity<Inventory>(inventory,HttpStatus.OK);
+        } catch (Exception e) {
+            ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
+            return new ResponseEntity<ErrorResponse>(err,HttpStatus.NOT_FOUND);
         }
     }
 
