@@ -24,5 +24,4 @@ public interface InventoryServiceRequest {
     @PutMapping("/skucode/{skucode}/variant/{variantSkucode}/quantity")
     Optional<QuantityResponse> updateVariantQuantityBySkucode(@PathVariable("skucode") String skucode,@PathVariable("variantSkucode") String variantSkucode);
     
-
 }

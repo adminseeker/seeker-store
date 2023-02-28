@@ -1,5 +1,6 @@
 package com.adminseeker.orderservice.entities;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.data.annotation.Id;
@@ -25,5 +26,7 @@ public class Item {
     @NotNull(message="Empty Value Not Allowed!")
     @Field(value = "price")
     private Double price;
+    @NotEmpty(message = "Empty Value Not Allowed!")
+    private String status;
 
 }

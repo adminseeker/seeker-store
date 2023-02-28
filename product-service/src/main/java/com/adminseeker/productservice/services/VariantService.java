@@ -34,6 +34,14 @@ public class VariantService {
         Product productdb = repo.findById(productId).orElseThrow(()->new ResourceNotFound("Product Not Found!"));
         if (!userId.equals(productdb.getSellerId())) throw new ResourceUpdateError("Unauthorised User!"); 
         List<Variant> variants = productdb.getVariants();
+        Boolean isSkucodePresent=false;
+        for (Variant v : variants){
+            if(v.getVariantSkucode().equals(variantRequest.getVariant().getVariantSkucode())){
+                isSkucodePresent=true;
+                break;
+            }             
+        }        
+        if (isSkucodePresent) throw new ResourceNotFound("Variant Already Exists!");
         variants.add(variant);
         productdb.setVariants(variants);
         Product updatedProduct = repo.save(productdb);
@@ -85,6 +93,16 @@ public class VariantService {
             }             
         }        
         if (!isPresent) throw new ResourceNotFound("Variant Not Found!");
+
+        Boolean isSkucodePresent=false;
+        for (Variant v : variantsdb){
+            if(!v.getVariantId().equals(variantId) && v.getVariantSkucode().equals(variantRequest.getVariant().getVariantSkucode())){
+                isSkucodePresent=true;
+                break;
+            }             
+        }        
+        if (isSkucodePresent) throw new ResourceNotFound("Variant Already Exists!");
+
         productdb.setVariants(variantsdb);
         repo.save(productdb);
         return variant;

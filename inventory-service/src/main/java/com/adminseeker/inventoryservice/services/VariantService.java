@@ -32,7 +32,27 @@ public class VariantService {
         Long userId = variantRequest.getUserId();
         Inventory inventorydb = repo.findById(inventoryId).orElseThrow(()->new ResourceNotFound("Inventory Not Found!"));
         if (!userId.equals(inventorydb.getSellerId())) throw new ResourceUpdateError("Unauthorised User!"); 
+        ProductResponse productResponse = productServiceRequest.getProductBySkucode(inventorydb.getSkucode()).orElseThrow(()-> new ResourceNotFound("Product Not Found!"));
+        if(productResponse.getProduct().getVariants()==null ) throw new ResourceNotFound("Product Has No Variants!");
+
+        Boolean isVariantCorrect = false;
+        for(com.adminseeker.inventoryservice.proxies.Variant v : productResponse.getProduct().getVariants()){
+            if(v.getVariantSkucode().equals(variantRequest.getVariant().getVariantSkucode())){
+                isVariantCorrect=true;
+            }
+        }
+
+        if(!isVariantCorrect) throw new ResourceNotFound("Variant Doesn't exist!");       
+
         List<Variant> variants = inventorydb.getVariants();
+        Boolean isSkucodePresent=false;
+        for (Variant v : variants){
+            if(v.getVariantSkucode().equals(variantRequest.getVariant().getVariantSkucode())){
+                isSkucodePresent=true;
+                break;
+            }             
+        }        
+        if (isSkucodePresent) throw new ResourceNotFound("Variant Already Exists!");
         variants.add(variant);
         inventorydb.setVariants(variants);
         Inventory updatedInventory = repo.save(inventorydb);
@@ -99,6 +119,26 @@ public class VariantService {
             }             
         }        
         if (!isPresent) throw new ResourceNotFound("Variant Not Found!");
+
+        Boolean isSkucodePresent=false;
+        for (Variant v : variantsdb){
+            if(!v.getVariantId().equals(variantId) && v.getVariantSkucode().equals(variantRequest.getVariant().getVariantSkucode())){
+                isSkucodePresent=true;
+                break;
+            }             
+        }        
+        if (isSkucodePresent) throw new ResourceNotFound("Variant Already Exists!");
+
+        Boolean isVariantCorrect = false;
+        for(com.adminseeker.inventoryservice.proxies.Variant v : productResponse.getProduct().getVariants()){
+            if(v.getVariantSkucode().equals(variantRequest.getVariant().getVariantSkucode())){
+                isVariantCorrect=true;
+                break;
+            }
+        }
+
+        if(!isVariantCorrect) throw new ResourceNotFound("Variant Doesn't exist!");
+
         inventorydb.setVariants(variantsdb);
         repo.save(inventorydb);
         return variant;
