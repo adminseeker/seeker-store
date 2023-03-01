@@ -22,6 +22,8 @@ import com.adminseeker.inventoryservice.entities.Inventory;
 import com.adminseeker.inventoryservice.entities.InventoryRequest;
 import com.adminseeker.inventoryservice.entities.InventoryResponse;
 import com.adminseeker.inventoryservice.entities.QuantityResponse;
+import com.adminseeker.inventoryservice.entities.QuantityUpdate;
+import com.adminseeker.inventoryservice.entities.QuantityUpdateRequest;
 import com.adminseeker.inventoryservice.services.InventoryService;
 
 
@@ -82,6 +84,16 @@ public class InventoryController {
         }
     }
 
+    @PostMapping("/skucode/getquantity")
+    public ResponseEntity<?> getProductQuantityBySkuCodes(@RequestBody QuantityUpdateRequest quantityUpdateRequest){
+        try {
+            List<QuantityUpdate> updates = inventoryService.getInventoryQuantityBySkuCodes(quantityUpdateRequest); 
+            return new ResponseEntity<List<QuantityUpdate>>(updates,HttpStatus.OK);
+        } catch (Exception e) {
+            ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
+            return new ResponseEntity<ErrorResponse>(err,HttpStatus.NOT_FOUND);
+        }
+    }
     
 
     @PatchMapping("/{id}")
@@ -97,11 +109,11 @@ public class InventoryController {
         }
     }
 
-    @PutMapping("/skucode/{skucode}/quantity")
-    public ResponseEntity<?> updateProductQuantityBySkuCode(@PathVariable String skucode, @RequestBody QuantityResponse quantityResponse){
+    @PutMapping("/skucode/quantity")
+    public ResponseEntity<?> updateProductQuantityBySkuCodes(@RequestBody QuantityUpdateRequest quantityUpdateRequest){
         try {
-            Inventory inventory = inventoryService.updateInventoryQuantityBySkuCode(quantityResponse,skucode);
-            return new ResponseEntity<Inventory>(inventory,HttpStatus.OK);
+            List<QuantityUpdate> updates = inventoryService.updateInventoryQuantityBySkuCodes(quantityUpdateRequest);
+            return new ResponseEntity<List<QuantityUpdate>>(updates,HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
             return new ResponseEntity<ErrorResponse>(err,HttpStatus.NOT_FOUND);

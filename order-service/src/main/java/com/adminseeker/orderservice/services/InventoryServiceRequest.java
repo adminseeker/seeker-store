@@ -1,27 +1,29 @@
 package com.adminseeker.orderservice.services;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
-import com.adminseeker.orderservice.proxies.QuantityResponse;
+import com.adminseeker.orderservice.proxies.QuantityUpdate;
+import com.adminseeker.orderservice.proxies.QuantityUpdateRequest;
 
 @FeignClient(value="inventory-feign-client",url="http://localhost:8083/api/v1/inventory")
 public interface InventoryServiceRequest {
     
-    @GetMapping("/skucode/{skucode}/quantity")
-    Optional<QuantityResponse> getProductQuantityBySkucode(@PathVariable("skucode") String skucode);
+    @PostMapping("/skucode/getquantity")
+    Optional<List<QuantityUpdate>> getProductQuantityBySkucodes(@RequestBody QuantityUpdateRequest quantityUpdateRequest);
 
-    @GetMapping("/skucode/{skucode}/variant/{variantSkucode}/quantity")
-    Optional<QuantityResponse> getVariantQuantityBySkucode(@PathVariable("skucode") String skucode,@PathVariable("variantSkucode") String variantSkucode);
+    @PostMapping("/variant/skucode/getquantity")
+    Optional<List<QuantityUpdate>> getVariantQuantityBySkucodes(@RequestBody QuantityUpdateRequest quantityUpdateRequest);
 
-    @PutMapping("/skucode/{skucode}/quantity")
-    Optional<QuantityResponse> updateProductQuantityBySkucode(@PathVariable("skucode") String skucode);
+    @PutMapping("/skucode/quantity")
+    Optional<List<QuantityUpdate>> updateProductQuantityBySkucodes(@RequestBody QuantityUpdateRequest quantityUpdateRequest);
 
-    @PutMapping("/skucode/{skucode}/variant/{variantSkucode}/quantity")
-    Optional<QuantityResponse> updateVariantQuantityBySkucode(@PathVariable("skucode") String skucode,@PathVariable("variantSkucode") String variantSkucode);
+    @PutMapping("/variant/skucode/quantity")
+    Optional<List<QuantityUpdate>> updateVariantQuantityBySkucodes(@RequestBody QuantityUpdateRequest quantityUpdateRequest);
     
 }

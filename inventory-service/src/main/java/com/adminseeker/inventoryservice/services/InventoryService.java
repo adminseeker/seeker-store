@@ -8,6 +8,8 @@ import com.adminseeker.inventoryservice.entities.Inventory;
 import com.adminseeker.inventoryservice.entities.InventoryRequest;
 import com.adminseeker.inventoryservice.entities.InventoryResponse;
 import com.adminseeker.inventoryservice.entities.QuantityResponse;
+import com.adminseeker.inventoryservice.entities.QuantityUpdate;
+import com.adminseeker.inventoryservice.entities.QuantityUpdateRequest;
 import com.adminseeker.inventoryservice.exceptions.DuplicateResourceException;
 import com.adminseeker.inventoryservice.exceptions.ResourceNotFound;
 import com.adminseeker.inventoryservice.exceptions.ResourceUpdateError;
@@ -37,7 +39,7 @@ public class InventoryService {
         if(productresponse.getProduct().getVariants()==null && inventory.getVariants().size()!=0) throw new ResourceNotFound("Product Has No Variants!");
         Inventory check = repo.findBySkucode(inventory.getSkucode()).orElse(null); 
         if(check!=null) throw new DuplicateResourceException("Product Skucode Already Exists!");
-        
+        if(inventory.getQuantity()<0) throw new ResourceUpdateError("invalid quantity!");
         return repo.save(inventory);
     }
 
@@ -71,6 +73,20 @@ public class InventoryService {
         return quantityResponse;
     }
 
+
+    public List<QuantityUpdate>  getInventoryQuantityBySkuCodes(QuantityUpdateRequest quantityUpdateRequest) throws Exception{
+        List<QuantityUpdate> updates = quantityUpdateRequest.getQuantityUpdates();
+        if(updates==null || updates.size()==0) throw new ResourceUpdateError("nothing to update");
+        for (QuantityUpdate update : updates){
+            Inventory inventorydb = repo.findBySkucode(update.getProductSkucode()).orElseThrow(()->new ResourceNotFound("Inventory Not Found!"));
+
+            if(inventorydb.getQuantity()!=null){
+                update.setQuantity(inventorydb.getQuantity());
+            }
+            if(inventorydb.getQuantity()<0) throw new ResourceUpdateError("invalid quantity!");
+        }
+        return updates;
+    }
     
 
     public Inventory updateInventoryById(Inventory inventory,Long inventoryId) throws Exception{
@@ -91,19 +107,25 @@ public class InventoryService {
         if(inventory.getQuantity()!=null){
             inventorydb.setQuantity(inventory.getQuantity());
         }
+        if(inventory.getQuantity()<0) throw new ResourceUpdateError("invalid quantity!");
+
 
         return repo.save(inventorydb);
     }
 
-    public Inventory updateInventoryQuantityBySkuCode(QuantityResponse quantityResponse,String skucode) throws Exception{
-        Inventory inventorydb = repo.findBySkucode(skucode).orElseThrow(()->new ResourceNotFound("Inventory Not Found!"));
-        productServiceRequest.getProductBySkucode(inventorydb.getSkucode()).orElseThrow(()-> new ResourceNotFound("Product Not Found!"));
+    public List<QuantityUpdate>  updateInventoryQuantityBySkuCodes(QuantityUpdateRequest quantityUpdateRequest) throws Exception{
+        List<QuantityUpdate> updates = quantityUpdateRequest.getQuantityUpdates();
+        if(updates==null || updates.size()==0) throw new ResourceUpdateError("nothing to update");
+        for (QuantityUpdate update : updates){
+            Inventory inventorydb = repo.findBySkucode(update.getProductSkucode()).orElseThrow(()->new ResourceNotFound("Inventory Not Found!"));
 
-        if(quantityResponse.getQuantity()!=null){
-            inventorydb.setQuantity(quantityResponse.getQuantity());
+            if(update.getQuantity()!=null){
+                inventorydb.setQuantity(update.getQuantity());
+            }
+            if(inventorydb.getQuantity()<0) throw new ResourceUpdateError("invalid quantity!");
+            repo.save(inventorydb);
         }
-
-        return repo.save(inventorydb);
+        return updates;
     }
 
     public Inventory DeleteInventoryById(Long inventoryId,InventoryRequest inventoryRequest){

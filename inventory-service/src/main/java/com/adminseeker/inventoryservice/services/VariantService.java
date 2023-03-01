@@ -8,6 +8,8 @@ import com.adminseeker.inventoryservice.entities.Variant;
 import com.adminseeker.inventoryservice.entities.VariantRequest;
 import com.adminseeker.inventoryservice.entities.Inventory;
 import com.adminseeker.inventoryservice.entities.QuantityResponse;
+import com.adminseeker.inventoryservice.entities.QuantityUpdate;
+import com.adminseeker.inventoryservice.entities.QuantityUpdateRequest;
 import com.adminseeker.inventoryservice.exceptions.ResourceNotFound;
 import com.adminseeker.inventoryservice.exceptions.ResourceUpdateError;
 import com.adminseeker.inventoryservice.proxies.ProductResponse;
@@ -53,6 +55,8 @@ public class VariantService {
             }             
         }        
         if (isSkucodePresent) throw new ResourceNotFound("Variant Already Exists!");
+        if(variant.getQuantity()<0) throw new ResourceUpdateError("invalid quantity!");
+
         variants.add(variant);
         inventorydb.setVariants(variants);
         Inventory updatedInventory = repo.save(inventorydb);
@@ -97,6 +101,34 @@ public class VariantService {
         return quantityResponse;
     }
 
+    public List<QuantityUpdate> getVariantQuantityBySkucodes(QuantityUpdateRequest quantityUpdateRequest){
+        List<QuantityUpdate> updates =  quantityUpdateRequest.getQuantityUpdates();
+        for(QuantityUpdate update : updates){
+            Inventory inventorydb = repo.findBySkucode(update.getProductSkucode()).orElseThrow(()->new ResourceNotFound("Inventory Not Found!"));
+            if(inventorydb.getQuantity()<0) throw new ResourceUpdateError("invalid quantity!");
+
+            List<Variant> variantsdb = inventorydb.getVariants();
+            if(update.getVariantSkucode()==null) throw new ResourceUpdateError("Nothing to update!");
+            // ProductResponse productResponse = productServiceRequest.getProductBySkucode(inventorydb.getSkucode()).orElseThrow(()-> new ResourceNotFound("Product Not Found!"));
+            // if(productResponse.getProduct().getVariants()==null ) throw new ResourceNotFound("Product Has No Variants!");
+
+            Boolean isPresent=false;
+            Variant variant=null;
+            for (Variant v : variantsdb){
+                if(v.getVariantSkucode().equals(update.getVariantSkucode())){
+                    Integer index = variantsdb.indexOf(v);
+                    update.setQuantity(v.getQuantity());
+                    variant=v;
+                    isPresent=true;
+                }             
+            }        
+            if (!isPresent) throw new ResourceNotFound("Variant Not Found!");
+
+        }
+        
+        return updates;
+    }
+
     public Variant UpdateVariantById(Long inventoryId,VariantRequest variantRequest,Long variantId){
         Long userId=variantRequest.getUserId();
         Variant variant=variantRequest.getVariant();
@@ -128,6 +160,7 @@ public class VariantService {
             }             
         }        
         if (isSkucodePresent) throw new ResourceNotFound("Variant Already Exists!");
+        if(variant.getQuantity()<0) throw new ResourceUpdateError("invalid quantity!");
 
         Boolean isVariantCorrect = false;
         for(com.adminseeker.inventoryservice.proxies.Variant v : productResponse.getProduct().getVariants()){
@@ -144,30 +177,35 @@ public class VariantService {
         return variant;
     }
 
-    public Variant UpdateVariantQuantityBySkucode(String skucode,QuantityResponse quantityResponse,String variantSkucode){
-        Inventory inventorydb = repo.findBySkucode(skucode).orElseThrow(()->new ResourceNotFound("Inventory Not Found!"));
+    public List<QuantityUpdate> UpdateVariantQuantityBySkucodes(QuantityUpdateRequest quantityUpdateRequest){
+        List<QuantityUpdate> updates =  quantityUpdateRequest.getQuantityUpdates();
+        for(QuantityUpdate update : updates){
+            Inventory inventorydb = repo.findBySkucode(update.getProductSkucode()).orElseThrow(()->new ResourceNotFound("Inventory Not Found!"));
+            if(update.getQuantity()<0) throw new ResourceUpdateError("invalid quantity!");
 
-        List<Variant> variantsdb = inventorydb.getVariants();
-        if(variantSkucode==null) throw new ResourceUpdateError("Nothing to update!");
-        ProductResponse productResponse = productServiceRequest.getProductBySkucode(inventorydb.getSkucode()).orElseThrow(()-> new ResourceNotFound("Product Not Found!"));
-        if(productResponse.getProduct().getVariants()==null ) throw new ResourceNotFound("Product Has No Variants!");
+            List<Variant> variantsdb = inventorydb.getVariants();
+            if(update.getVariantSkucode()==null) throw new ResourceUpdateError("Nothing to update!");
+            // ProductResponse productResponse = productServiceRequest.getProductBySkucode(inventorydb.getSkucode()).orElseThrow(()-> new ResourceNotFound("Product Not Found!"));
+            // if(productResponse.getProduct().getVariants()==null ) throw new ResourceNotFound("Product Has No Variants!");
 
-        Boolean isPresent=false;
-        Variant variant=null;
-        for (Variant v : variantsdb){
-            if(v.getVariantSkucode().equals(variantSkucode)){
-                Integer index = variantsdb.indexOf(v);
-                v.setQuantity(quantityResponse.getQuantity());
-                variantsdb.set(index, v);
-                variant=v;
-                isPresent=true;
-                break;
-            }             
-        }        
-        if (!isPresent) throw new ResourceNotFound("Variant Not Found!");
-        inventorydb.setVariants(variantsdb);
-        repo.save(inventorydb);
-        return variant;
+            Boolean isPresent=false;
+            Variant variant=null;
+            for (Variant v : variantsdb){
+                if(v.getVariantSkucode().equals(update.getVariantSkucode())){
+                    Integer index = variantsdb.indexOf(v);
+                    v.setQuantity(update.getQuantity());
+                    variantsdb.set(index, v);
+                    variant=v;
+                    isPresent=true;
+                }             
+            }        
+            if (!isPresent) throw new ResourceNotFound("Variant Not Found!");
+
+            inventorydb.setVariants(variantsdb);
+            repo.save(inventorydb);
+        }
+        
+        return updates;
     }
 
 

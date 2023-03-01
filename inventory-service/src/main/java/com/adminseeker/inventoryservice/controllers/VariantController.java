@@ -20,6 +20,8 @@ import com.adminseeker.inventoryservice.entities.Variant;
 import com.adminseeker.inventoryservice.entities.VariantRequest;
 import com.adminseeker.inventoryservice.entities.ErrorResponse;
 import com.adminseeker.inventoryservice.entities.QuantityResponse;
+import com.adminseeker.inventoryservice.entities.QuantityUpdate;
+import com.adminseeker.inventoryservice.entities.QuantityUpdateRequest;
 import com.adminseeker.inventoryservice.services.VariantService;
 
 
@@ -74,6 +76,17 @@ public class VariantController {
         }
     }
 
+    @PostMapping("/variant/skucode/getquantity")
+    public ResponseEntity<?> getProductVariantQuantityBySkuCodes(@RequestBody QuantityUpdateRequest quantityUpdateRequest){
+        try {
+            List<QuantityUpdate> updates = variantService.getVariantQuantityBySkucodes(quantityUpdateRequest);
+            return new ResponseEntity<List<QuantityUpdate>>(updates,HttpStatus.OK);
+        } catch (Exception e) {
+            ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
+            return new ResponseEntity<ErrorResponse>(err,HttpStatus.NOT_FOUND);
+        }
+    }
+
     @PutMapping("/{inventoryId}/variant/{variantId}")
     public ResponseEntity<?> updateById(@RequestBody VariantRequest variantrequest, @PathVariable Long inventoryId, @PathVariable Long variantId){
         try{
@@ -87,11 +100,11 @@ public class VariantController {
         }
     }
 
-    @PutMapping("/skucode/{skucode}/variant/{variantSkucode}/quantity")
-    public ResponseEntity<?> updateProductVariantQuantityBySkuCode(@PathVariable String skucode, @PathVariable String variantSkucode,@RequestBody QuantityResponse quanityResponse){
+    @PutMapping("/variant/skucode/quantity")
+    public ResponseEntity<?> updateProductVariantQuantityBySkuCodes(@RequestBody QuantityUpdateRequest quantityUpdateRequest){
         try {
-            Variant variant = variantService.UpdateVariantQuantityBySkucode(skucode, quanityResponse, variantSkucode);
-            return new ResponseEntity<Variant>(variant,HttpStatus.OK);
+            List<QuantityUpdate> updates = variantService.UpdateVariantQuantityBySkucodes(quantityUpdateRequest);
+            return new ResponseEntity<List<QuantityUpdate>>(updates,HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
             return new ResponseEntity<ErrorResponse>(err,HttpStatus.NOT_FOUND);

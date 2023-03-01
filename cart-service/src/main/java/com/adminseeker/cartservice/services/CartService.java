@@ -65,6 +65,7 @@ public class CartService {
             quantityResponse=inventoryServiceRequest.getProductQuantityBySkucode(productResponse.getProduct().getSkucode()).orElseThrow(()->new ResourceNotFound("Product Not Found!"));
 
         }
+        if(item.getQuantity()<1) throw new ResourceUpdateError("Minimum 1 quantity should be selected!");
         if(item.getQuantity()>quantityResponse.getQuantity()) throw new ResourceUpdateError("Out of Stock!");
         List<Item> items=null;
         if(cartdb.getItems()==null){
@@ -118,6 +119,7 @@ public class CartService {
 
         }
         if(item.getQuantity()>quantityResponse.getQuantity()) throw new ResourceUpdateError("Out of Stock!");
+        if(item.getQuantity()<1) throw new ResourceUpdateError("Minimum 1 quantity should be selected!");
         List<Item> items = cartdb.getItems();
         
         Boolean isItemPresent=false;
