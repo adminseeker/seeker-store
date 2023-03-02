@@ -1,9 +1,4 @@
 package com.adminseeker.orderservice.proxies;
-
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
-
 import lombok.Data;
 
 @Data
