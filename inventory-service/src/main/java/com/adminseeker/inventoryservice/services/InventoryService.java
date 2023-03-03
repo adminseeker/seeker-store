@@ -79,7 +79,6 @@ public class InventoryService {
         if(updates==null || updates.size()==0) throw new ResourceUpdateError("nothing to update");
         for (QuantityUpdate update : updates){
             Inventory inventorydb = repo.findBySkucode(update.getProductSkucode()).orElseThrow(()->new ResourceNotFound("Inventory Not Found!"));
-
             if(inventorydb.getQuantity()!=null){
                 update.setQuantity(inventorydb.getQuantity());
             }

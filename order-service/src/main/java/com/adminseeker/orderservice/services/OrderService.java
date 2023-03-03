@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.adminseeker.orderservice.entities.Item;
 import com.adminseeker.orderservice.entities.Order;
+import com.adminseeker.orderservice.entities.OrderRequest;
 import com.adminseeker.orderservice.exceptions.ResourceNotFound;
 import com.adminseeker.orderservice.exceptions.ResourceUpdateError;
 import com.adminseeker.orderservice.proxies.Address;
@@ -200,4 +201,161 @@ public class OrderService {
         return orderResponse;
     }
 
+    public Order cancelOrder(OrderRequest orderRequest){
+        String orderId = orderRequest.getOrderId();
+        Long userId = orderRequest.getUserId();
+        Order order = repo.findById(orderId).orElseThrow(()->new ResourceNotFound("Order Not Found!"));
+        if(order.getUserId()!=userId) throw new ResourceUpdateError("Unauthorised User!");
+        if(order.getStatus()=="order_cancelled") throw new ResourceUpdateError("Order Is Already Cancelled!");
+        List<Item> items = order.getItems();
+        List<QuantityUpdate> products = new ArrayList<QuantityUpdate>();
+        List<QuantityUpdate> variants = new ArrayList<QuantityUpdate>();
+        List<ProductResponse> productResponses= new ArrayList<ProductResponse>();  
+        for(Item orderItem : items){
+            ProductResponse productResponse = productServiceRequest.getProductById(orderItem.getProductId()).orElse(null);
+            productResponses.add(productResponse);
+            if(orderItem.getProductId()!=null && orderItem.getVariantId()==null){
+                QuantityUpdate product = new QuantityUpdate();
+                product.setProductSkucode(productResponse.getProduct().getSkucode());
+                products.add(product);
+            }else if(orderItem.getProductId()!=null && orderItem.getVariantId()!=null){
+                QuantityUpdate variant = new QuantityUpdate();
+                if(productResponse.getProduct().getVariants()==null || productResponse.getProduct().getVariants().size()==0 ) throw new ResourceUpdateError("Variant Not Found!");
+                Variant productVariant = new Variant();
+                for(Variant v : productResponse.getProduct().getVariants()){
+                    if(v.getVariantId().equals(orderItem.getVariantId())){
+                        productVariant = v;
+                        break;
+                    }
+                }
+                variant.setProductSkucode(productResponse.getProduct().getSkucode());
+                variant.setVariantSkucode(productVariant.getVariantSkucode());
+                variant.setProductId(productResponse.getProduct().getProductId());
+                variants.add(variant);
+            }
+        }
+
+        QuantityUpdateRequest updateRequest = new QuantityUpdateRequest();
+        updateRequest.setQuantityUpdates(products);
+        products = inventoryServiceRequest.getProductQuantityBySkucodes(updateRequest).orElse(null);
+        updateRequest.setQuantityUpdates(variants);
+        variants = inventoryServiceRequest.getVariantQuantityBySkucodes(updateRequest).orElse(null);
+
+        if((products==null && variants==null)) throw new ResourceUpdateError("Inventory Error!");
+
+        for (ProductResponse pResp : productResponses){
+            if(products!=null){
+                for(QuantityUpdate product : products){
+                    if(pResp.getProduct().getSkucode().equals(product.getProductSkucode())){
+                        product.setProductId(pResp.getProduct().getProductId());
+                    }
+                }
+            }
+            if(variants!=null && pResp.getProduct().getVariants()!=null){
+                for(Variant v : pResp.getProduct().getVariants()){
+                    for(QuantityUpdate variant : variants){
+                        if(variant.getVariantSkucode().equals(v.getVariantSkucode())){
+                            variant.setProductId(pResp.getProduct().getProductId());
+                            variant.setVariantId(v.getVariantId());
+                        }
+                    }
+                }
+            } 
+            
+        }
+
+
+        for(Item orderItem: items){
+            if(products!=null && orderItem.getProductId()!=null && orderItem.getVariantId()==null){
+                for(QuantityUpdate product : products){
+                    if(product.getProductId().equals(orderItem.getProductId())){
+                        product.setQuantity(product.getQuantity()+orderItem.getQuantity());
+                    }
+                }
+            }if(variants!=null && orderItem.getProductId()!=null && orderItem.getVariantId()!=null){
+                for(QuantityUpdate variant : variants){
+                    if(variant.getVariantId().equals(orderItem.getVariantId())){
+                        variant.setQuantity(variant.getQuantity()+orderItem.getQuantity());
+                    }
+                }
+            }
+            orderItem.setStatus("order_cancelled");
+        }
+
+        updateRequest.setQuantityUpdates(products);
+        products = inventoryServiceRequest.updateProductQuantityBySkucodes(updateRequest).orElse(null);
+        updateRequest.setQuantityUpdates(variants);
+        variants = inventoryServiceRequest.updateVariantQuantityBySkucodes(updateRequest).orElse(null);
+
+        if((products==null && variants==null)) throw new ResourceUpdateError("Inventory Error!");
+
+        order.setStatus("order_cancelled");
+        order.setItems(items);
+        return repo.save(order);
+    }
+
+    public Order cancelPartialOrder(OrderRequest orderRequest){
+        String orderId = orderRequest.getOrderId();
+        String itemId = orderRequest.getItemId();
+        Long userId = orderRequest.getUserId();
+        Order order = repo.findById(orderId).orElseThrow(()->new ResourceNotFound("Order Not Found!"));
+        if(order.getUserId()!=userId) throw new ResourceUpdateError("Unauthorised User!");
+        if(order.getStatus()=="order_cancelled") throw new ResourceUpdateError("Order Is Already Cancelled!");
+
+        List<Item> items = order.getItems();
+        Item cancelItem = null;
+        for(Item item : items){
+            if(item.getItemId().equals(itemId)){
+                cancelItem=item;
+                if(item.getStatus()=="order_cancelled") throw new ResourceUpdateError("Order Item Already Cancelled!");
+                item.setStatus("order_cancelled");
+                break;
+            }
+        }
+        if(cancelItem==null) throw new ResourceUpdateError("Item Not Found!");
+        ProductResponse productResponse = productServiceRequest.getProductById(cancelItem.getProductId()).orElseThrow(()->new ResourceNotFound("Product Not Found!"));
+        QuantityUpdateRequest quantityUpdateRequest = new QuantityUpdateRequest();
+        List<QuantityUpdate> products = new ArrayList<QuantityUpdate>();
+        List<QuantityUpdate> variants = new ArrayList<QuantityUpdate>();
+        if(cancelItem.getVariantId()==null){
+            QuantityUpdate product = new QuantityUpdate();
+            product.setProductSkucode(productResponse.getProduct().getSkucode());
+            products.add(product);
+        }else {
+            QuantityUpdate variant = new QuantityUpdate();
+            for(Variant v : productResponse.getProduct().getVariants()){
+                if(productResponse.getProduct().getProductId().equals(cancelItem.getProductId()) && v.getVariantId().equals(cancelItem.getVariantId())){
+                    variant.setProductSkucode(productResponse.getProduct().getSkucode());
+                    variant.setVariantSkucode(v.getVariantSkucode());
+                    break;
+                }
+            }
+            variants.add(variant);
+        }
+        if(cancelItem.getVariantId()==null){
+            quantityUpdateRequest.setQuantityUpdates(products);
+            products=inventoryServiceRequest.getProductQuantityBySkucodes(quantityUpdateRequest).orElseThrow(()->new ResourceUpdateError("Inventory Error!"));
+            products.get(0).setQuantity(products.get(0).getQuantity()+cancelItem.getQuantity());
+            quantityUpdateRequest.setQuantityUpdates(products);
+            products=inventoryServiceRequest.updateProductQuantityBySkucodes(quantityUpdateRequest).orElse(null);
+        }else{
+            quantityUpdateRequest.setQuantityUpdates(variants);
+            variants=inventoryServiceRequest.getVariantQuantityBySkucodes(quantityUpdateRequest).orElseThrow(()->new ResourceUpdateError("Inventory Error!"));
+            variants.get(0).setQuantity(variants.get(0).getQuantity()+cancelItem.getQuantity());
+            quantityUpdateRequest.setQuantityUpdates(variants);
+            variants=inventoryServiceRequest.updateVariantQuantityBySkucodes(quantityUpdateRequest).orElse(null);
+        }
+
+        if(products==null && variants==null) throw new  ResourceUpdateError("Inventory Error!");
+        order.setTotalPrice(order.getTotalPrice()-cancelItem.getPrice());
+        order.setItems(items);
+        order.setStatus("order_partial_cancelled");
+        return repo.save(order);
+    }
+
+    public List<Order> getOrdersByStatus(String status){
+        List<Order> orders = repo.findByStatus(status).orElseThrow(()->new ResourceNotFound("orders not found!"));
+        return orders;
+    }
 }
+
