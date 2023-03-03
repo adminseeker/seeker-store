@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.adminseeker.orderservice.proxies.QuantityUpdate;
 import com.adminseeker.orderservice.proxies.QuantityUpdateRequest;
 
-@FeignClient(value="inventory-feign-client",url="http://localhost:8083/api/v1/inventory")
+@FeignClient(value="inventory-feign-client",url="http://${INVENTORY_SERVICE_URL:localhost:8083}/api/v1/inventory")
 public interface InventoryServiceRequest {
     
     @PostMapping("/skucode/getquantity")

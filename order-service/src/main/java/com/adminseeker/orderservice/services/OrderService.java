@@ -357,5 +357,10 @@ public class OrderService {
         List<Order> orders = repo.findByStatus(status).orElseThrow(()->new ResourceNotFound("orders not found!"));
         return orders;
     }
+
+    public List<Order> getOrdersByUserId(Long userId){
+        List<Order> orders = repo.findByUserId(userId).orElseThrow(()->new ResourceNotFound("orders not found!"));
+        return orders;
+    }
 }
 

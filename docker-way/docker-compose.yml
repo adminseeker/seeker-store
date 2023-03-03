@@ -1,0 +1,127 @@
+version: '3.8'
+
+services:
+  mysqldb:
+    image: mysql
+    restart: always
+    environment:
+       MYSQL_ROOT_PASSWORD: password
+       MYSQL_USER: user
+       MYSQL_PASSWORD: password
+    volumes:
+      - mysql_db_data:/var/lib/mysql
+      - ./init-mysql.sql:/docker-entrypoint-initdb.d/init-mysql.sql
+    ports:
+      - 3306:3306
+    expose:
+      - 3306
+    networks:
+      seeker-network:
+
+  mongodb:
+    image: mongo
+    restart: always
+    environment:
+        MONGO_INITDB_ROOT_USERNAME: root
+        MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongo_db_data:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
+    ports:
+      - 27017:27017
+    expose:
+      - 27017
+    networks:
+      seeker-network:
+
+  userservice:
+      image: adminseeker/user-service
+      ports:
+        - 8081:8081
+      environment:
+        - MYSQL_HOST=mysqldb
+        - MYSQL_PORT=3306
+        - MYSQL_USER=user
+        - MYSQL_PASSWORD=password
+      depends_on:
+        - mysqldb
+      networks:
+        seeker-network:
+      restart: on-failure
+      
+  productservice:
+    image: adminseeker/product-service
+    ports:
+      - 8082:8082
+    environment:
+      - MYSQL_HOST=mysqldb
+      - MYSQL_PORT=3306
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - USER_SERVICE_URL=userservice:8081
+    depends_on:
+      - mysqldb
+    networks:
+      seeker-network:
+    restart: on-failure
+
+  inventoryservice:
+    image: adminseeker/inventory-service
+    ports:
+      - 8083:8083
+    environment:
+      - MYSQL_HOST=mysqldb
+      - MYSQL_PORT=3306
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - PRODUCT_SERVICE_URL=productservice:8082
+    depends_on:
+      - mysqldb
+    networks:
+      seeker-network:
+    restart: on-failure
+
+  cartservice:
+    image: adminseeker/cart-service
+    ports:
+      - 8084:8084
+    environment:
+      - MONGO_HOST=mongodb
+      - MONGO_PORT=27017
+      - MONGO_USER=user
+      - MONGO_PASSWORD=password
+      - USER_SERVICE_URL=userservice:8081
+      - PRODUCT_SERVICE_URL=productservice:8082
+      - INVENTORY_SERVICE_URL=inventoryservice:8083
+    depends_on:
+      - mongodb
+    networks:
+      seeker-network:
+    restart: on-failure
+
+  orderservice:
+    image: adminseeker/order-service
+    ports:
+      - 8085:8085
+    environment:
+      - MONGO_HOST=mongodb
+      - MONGO_PORT=27017
+      - MONGO_USER=user
+      - MONGO_PASSWORD=password
+      - USER_SERVICE_URL=userservice:8081
+      - PRODUCT_SERVICE_URL=productservice:8082
+      - INVENTORY_SERVICE_URL=inventoryservice:8083
+      - CART_SERVICE_URL=cartservice:8084
+    depends_on:
+      - mongodb
+    networks:
+      seeker-network:
+    restart: on-failure
+
+ 
+volumes:
+  mysql_db_data:
+  mongo_db_data:
+
+networks:
+  seeker-network:

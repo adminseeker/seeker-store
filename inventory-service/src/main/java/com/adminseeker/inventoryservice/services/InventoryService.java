@@ -16,6 +16,7 @@ import com.adminseeker.inventoryservice.exceptions.ResourceUpdateError;
 import com.adminseeker.inventoryservice.proxies.ProductResponse;
 import com.adminseeker.inventoryservice.repository.InventoryRepo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -76,7 +77,7 @@ public class InventoryService {
 
     public List<QuantityUpdate>  getInventoryQuantityBySkuCodes(QuantityUpdateRequest quantityUpdateRequest) throws Exception{
         List<QuantityUpdate> updates = quantityUpdateRequest.getQuantityUpdates();
-        if(updates==null || updates.size()==0) throw new ResourceUpdateError("nothing to update");
+        if(updates==null || updates.size()==0) return new ArrayList<QuantityUpdate>();
         for (QuantityUpdate update : updates){
             Inventory inventorydb = repo.findBySkucode(update.getProductSkucode()).orElseThrow(()->new ResourceNotFound("Inventory Not Found!"));
             if(inventorydb.getQuantity()!=null){
@@ -114,7 +115,7 @@ public class InventoryService {
 
     public List<QuantityUpdate>  updateInventoryQuantityBySkuCodes(QuantityUpdateRequest quantityUpdateRequest) throws Exception{
         List<QuantityUpdate> updates = quantityUpdateRequest.getQuantityUpdates();
-        if(updates==null || updates.size()==0) throw new ResourceUpdateError("nothing to update");
+        if(updates==null || updates.size()==0) return new ArrayList<QuantityUpdate>();
         for (QuantityUpdate update : updates){
             Inventory inventorydb = repo.findBySkucode(update.getProductSkucode()).orElseThrow(()->new ResourceNotFound("Inventory Not Found!"));
 

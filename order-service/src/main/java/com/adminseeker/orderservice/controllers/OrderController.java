@@ -83,5 +83,16 @@ public class OrderController {
         }
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> getOrdersByUserId(@PathVariable Long userId){
+        try {
+            List<Order> orders= orderService.getOrdersByUserId(userId); 
+            return new ResponseEntity<List<Order>>(orders,HttpStatus.OK);
+        } catch (Exception e) {
+            ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
+            return new ResponseEntity<ErrorResponse>(err,HttpStatus.NOT_FOUND);
+        }
+    }
+
    
 }

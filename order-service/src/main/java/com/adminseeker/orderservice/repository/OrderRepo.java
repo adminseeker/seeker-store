@@ -9,6 +9,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import com.adminseeker.orderservice.entities.Order;
 
 public interface OrderRepo extends MongoRepository<Order, String>{
-    Optional<Order> findByUserId(Long userId);
+    Optional<List<Order>> findByUserId(Long userId);
     Optional<List<Order>> findByStatus(String status);
 }

@@ -12,7 +12,7 @@ import com.adminseeker.orderservice.proxies.CartRequest;
 
 import com.adminseeker.orderservice.proxies.CartResponse;
 
-@FeignClient(value="cart-feign-client",url="http://localhost:8084/api/v1/cart")
+@FeignClient(value="cart-feign-client",url="http://${CART_SERVICE_URL:localhost:8084}/api/v1/cart")
 public interface CartServiceRequest {
     
     @GetMapping("/{userId}")
