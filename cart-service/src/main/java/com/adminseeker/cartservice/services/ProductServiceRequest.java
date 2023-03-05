@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.adminseeker.cartservice.proxies.ProductResponse;
 
-@FeignClient(value="product-feign-client",url="http://${PRODUCT_SERVICE_URL:localhost:8082}/api/v1/products")
+@FeignClient(value="product-feign-client",url="http://${PRODUCT_SERVICE_URL}/api/v1/products")
 public interface ProductServiceRequest {
 
     @GetMapping("/skucode/{skucode}")

@@ -1,0 +1,158 @@
+version: '3.8'
+
+services:
+  mysqldb:
+    image: mysql
+    restart: always
+    environment:
+       MYSQL_ROOT_PASSWORD: password
+       MYSQL_USER: user
+       MYSQL_PASSWORD: password
+    volumes:
+      - mysql_db_data:/var/lib/mysql
+      - ./init-mysql.sql:/docker-entrypoint-initdb.d/init-mysql.sql
+    ports:
+      - 3306:3306
+    expose:
+      - 3306
+    networks:
+      seeker-network:
+
+  mongodb:
+    image: mongo
+    restart: always
+    environment:
+        MONGO_INITDB_ROOT_USERNAME: root
+        MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - mongo_db_data:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
+    ports:
+      - 27017:27017
+    expose:
+      - 27017
+    networks:
+      seeker-network:
+
+  configserver:
+      image: adminseeker/config-service
+      ports:
+        - 9000:9000
+      environment:
+        - APPLICATION_NAME=configserver
+        - CONFIG_MYSQL_HOST=mysqldb
+        - CONFIG_MYSQL_PORT=3306
+        - CONFIG_MYSQL_USER=user
+        - CONFIG_MYSQL_PASSWORD=password
+        - CONFIG_MYSQL_DB=config_server_db
+        - CONFIG_SERVER_USER=user
+        - CONFIG_SERVER_PASSWORD=password
+        - CONFIG_SERVER_PORT=9000
+      depends_on:
+        - mysqldb
+      networks:
+        seeker-network:
+      restart: on-failure
+
+  userservice:
+    image: adminseeker/user-service
+    ports:
+      - 8081:8081
+    environment:
+      - CONFIG_PROFILE=dev
+      - CONFIG_LABEL=latest
+      - APPLICATION_NAME=userservice
+      - CONFIG_SERVER=optional:configserver:http://user:password@configserver:9000
+      - SERVICE_PORT:8081
+    depends_on:
+      - mysqldb
+      - configserver
+    networks:
+      seeker-network:
+    restart: on-failure
+
+  productservice:
+    image: adminseeker/product-service
+    ports:
+      - 8082:8082
+    environment:
+      - CONFIG_PROFILE=dev
+      - CONFIG_LABEL=latest
+      - APPLICATION_NAME=productservice
+      - CONFIG_SERVER=optional:configserver:http://user:password@configserver:9000
+      - SERVICE_PORT:8082
+    depends_on:
+      - mysqldb
+      - configserver
+      - userservice
+    networks:
+      seeker-network:
+    restart: on-failure
+
+  inventoryservice:
+    image: adminseeker/inventory-service
+    ports:
+      - 8083:8083
+    environment:
+      - CONFIG_PROFILE=dev
+      - CONFIG_LABEL=latest
+      - APPLICATION_NAME=inventoryservice
+      - CONFIG_SERVER=optional:configserver:http://user:password@configserver:9000
+      - SERVICE_PORT:8083
+    depends_on:
+      - mysqldb
+      - configserver
+      - productservice
+    networks:
+      seeker-network:
+    restart: on-failure
+
+  cartservice:
+    image: adminseeker/cart-service
+    ports:
+      - 8084:8084
+    environment:
+      - CONFIG_PROFILE=dev
+      - CONFIG_LABEL=latest
+      - APPLICATION_NAME=cartservice
+      - CONFIG_SERVER=optional:configserver:http://user:password@configserver:9000
+      - SERVICE_PORT:8084
+    depends_on:
+      - mongodb
+      - configserver
+      - userservice
+      - productservice
+      - inventoryservice
+
+    networks:
+      seeker-network:
+    restart: on-failure
+
+  orderservice:
+    image: adminseeker/order-service
+    ports:
+      - 8085:8085
+    environment:
+      - CONFIG_PROFILE=dev
+      - CONFIG_LABEL=latest
+      - APPLICATION_NAME=orderservice
+      - CONFIG_SERVER=optional:configserver:http://user:password@configserver:9000
+      - SERVICE_PORT:8085
+    depends_on:
+      - mongodb
+      - configserver
+      - userservice
+      - productservice
+      - inventoryservice
+      - cartservice
+
+    networks:
+      seeker-network:
+    restart: on-failure
+
+volumes:
+  mysql_db_data:
+  mongo_db_data:
+
+networks:
+  seeker-network:

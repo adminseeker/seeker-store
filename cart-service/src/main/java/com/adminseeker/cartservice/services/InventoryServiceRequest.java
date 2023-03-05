@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.adminseeker.cartservice.proxies.QuantityResponse;
 
-@FeignClient(value="inventory-feign-client",url="http://${INVENTORY_SERVICE_URL:localhost:8083}/api/v1/inventory")
+@FeignClient(value="inventory-feign-client",url="http://${INVENTORY_SERVICE_URL}/api/v1/inventory")
 public interface InventoryServiceRequest {
     
     @GetMapping("/skucode/{skucode}/quantity")
