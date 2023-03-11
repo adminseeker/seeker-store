@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.adminseeker.orderservice.proxies.ProductResponse;
 
-@FeignClient(value="product-feign-client",url="http://${PRODUCT_SERVICE_URL}/api/v1/products")
+@FeignClient("productservice")
 public interface ProductServiceRequest {
 
-    @GetMapping("/skucode/{skucode}")
+    @GetMapping("/api/v1/products/skucode/{skucode}")
     Optional<ProductResponse> getProductBySkucode(@PathVariable("skucode") String skucode);
 
-    @GetMapping("/{productId}")
+    @GetMapping("/api/v1/products/{productId}")
     Optional<ProductResponse> getProductById(@PathVariable("productId") Long productId);
 }

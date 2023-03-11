@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.adminseeker.cartservice.proxies.UserResponse;
 
-@FeignClient(value="user-feign-client",url="http://${USER_SERVICE_URL}/api/v1/users")
+@FeignClient("userservice")
 public interface UserServiceRequest {
 
-    @GetMapping("/{userId}")
+    @GetMapping("/api/v1/users/{userId}")
     Optional<UserResponse> getUserById(@PathVariable("userId") Long userId);
 }

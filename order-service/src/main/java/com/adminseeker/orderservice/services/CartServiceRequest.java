@@ -12,13 +12,13 @@ import com.adminseeker.orderservice.proxies.CartRequest;
 
 import com.adminseeker.orderservice.proxies.CartResponse;
 
-@FeignClient(value="cart-feign-client",url="http://${CART_SERVICE_URL}/api/v1/cart")
+@FeignClient("cartservice")
 public interface CartServiceRequest {
     
-    @GetMapping("/{userId}")
+    @GetMapping("/api/v1/cart/{userId}")
     Optional<CartResponse> getUserCart(@PathVariable("userId") Long userId);
 
-    @DeleteMapping("")
+    @DeleteMapping("/api/v1/cart")
     Optional<Cart> clearUserCart(@RequestBody CartRequest cartRequest);
     
 }

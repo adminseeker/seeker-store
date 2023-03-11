@@ -11,19 +11,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.adminseeker.orderservice.proxies.QuantityUpdate;
 import com.adminseeker.orderservice.proxies.QuantityUpdateRequest;
 
-@FeignClient(value="inventory-feign-client",url="http://${INVENTORY_SERVICE_URL}/api/v1/inventory")
+@FeignClient("inventoryservice")
 public interface InventoryServiceRequest {
     
-    @PostMapping("/skucode/getquantity")
+    @PostMapping("/api/v1/inventory/skucode/getquantity")
     Optional<List<QuantityUpdate>> getProductQuantityBySkucodes(@RequestBody QuantityUpdateRequest quantityUpdateRequest);
 
-    @PostMapping("/variant/skucode/getquantity")
+    @PostMapping("/api/v1/inventory/variant/skucode/getquantity")
     Optional<List<QuantityUpdate>> getVariantQuantityBySkucodes(@RequestBody QuantityUpdateRequest quantityUpdateRequest);
 
-    @PutMapping("/skucode/quantity")
+    @PutMapping("/api/v1/inventory/skucode/quantity")
     Optional<List<QuantityUpdate>> updateProductQuantityBySkucodes(@RequestBody QuantityUpdateRequest quantityUpdateRequest);
 
-    @PutMapping("/variant/skucode/quantity")
+    @PutMapping("/api/v1/inventory/variant/skucode/quantity")
     Optional<List<QuantityUpdate>> updateVariantQuantityBySkucodes(@RequestBody QuantityUpdateRequest quantityUpdateRequest);
     
 }

@@ -34,33 +34,60 @@ services:
     networks:
       seeker-network:
 
-  userservice:
-      image: adminseeker/user-service
+  configserver:
+      image: adminseeker/config-service
       ports:
-        - 8081:8081
+        - 9000:9000
       environment:
-        - MYSQL_HOST=mysqldb
-        - MYSQL_PORT=3306
-        - MYSQL_USER=user
-        - MYSQL_PASSWORD=password
+        - APPLICATION_NAME=configserver
+        - CONFIG_MYSQL_HOST=mysqldb
+        - CONFIG_MYSQL_PORT=3306
+        - CONFIG_MYSQL_USER=user
+        - CONFIG_MYSQL_PASSWORD=password
+        - CONFIG_MYSQL_DB=config_server_db
+        - CONFIG_SERVER_USER=user
+        - CONFIG_SERVER_PASSWORD=password
+        - CONFIG_SERVER_PORT=9000
       depends_on:
         - mysqldb
       networks:
         seeker-network:
       restart: on-failure
-      
+
+  userservice:
+    image: adminseeker/user-service
+    ports:
+      - 8081:8081
+    environment:
+      - CONFIG_PROFILE=dev
+      - CONFIG_LABEL=latest
+      - APPLICATION_NAME=userservice
+      - CONFIG_SERVER=optional:configserver:http://user:password@configserver:9000
+      - EUREKA_URL=http://eurekaserver:9001/eureka/
+      - VERSION=1.0.1
+      - SERVICE_PORT:8081
+    depends_on:
+      - mysqldb
+      - configserver
+      - eurekaserver
+    networks:
+      seeker-network:
+    restart: on-failure
+
   productservice:
     image: adminseeker/product-service
     ports:
       - 8082:8082
     environment:
-      - MYSQL_HOST=mysqldb
-      - MYSQL_PORT=3306
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=password
-      - USER_SERVICE_URL=userservice:8081
+      - CONFIG_PROFILE=dev
+      - CONFIG_LABEL=latest
+      - APPLICATION_NAME=productservice
+      - CONFIG_SERVER=optional:configserver:http://user:password@configserver:9000
+      - SERVICE_PORT:8082
     depends_on:
       - mysqldb
+      - configserver
+      - userservice
     networks:
       seeker-network:
     restart: on-failure
@@ -70,13 +97,15 @@ services:
     ports:
       - 8083:8083
     environment:
-      - MYSQL_HOST=mysqldb
-      - MYSQL_PORT=3306
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=password
-      - PRODUCT_SERVICE_URL=productservice:8082
+      - CONFIG_PROFILE=dev
+      - CONFIG_LABEL=latest
+      - APPLICATION_NAME=inventoryservice
+      - CONFIG_SERVER=optional:configserver:http://user:password@configserver:9000
+      - SERVICE_PORT:8083
     depends_on:
       - mysqldb
+      - configserver
+      - productservice
     networks:
       seeker-network:
     restart: on-failure
@@ -86,15 +115,18 @@ services:
     ports:
       - 8084:8084
     environment:
-      - MONGO_HOST=mongodb
-      - MONGO_PORT=27017
-      - MONGO_USER=user
-      - MONGO_PASSWORD=password
-      - USER_SERVICE_URL=userservice:8081
-      - PRODUCT_SERVICE_URL=productservice:8082
-      - INVENTORY_SERVICE_URL=inventoryservice:8083
+      - CONFIG_PROFILE=dev
+      - CONFIG_LABEL=latest
+      - APPLICATION_NAME=cartservice
+      - CONFIG_SERVER=optional:configserver:http://user:password@configserver:9000
+      - SERVICE_PORT:8084
     depends_on:
       - mongodb
+      - configserver
+      - userservice
+      - productservice
+      - inventoryservice
+
     networks:
       seeker-network:
     restart: on-failure
@@ -104,21 +136,23 @@ services:
     ports:
       - 8085:8085
     environment:
-      - MONGO_HOST=mongodb
-      - MONGO_PORT=27017
-      - MONGO_USER=user
-      - MONGO_PASSWORD=password
-      - USER_SERVICE_URL=userservice:8081
-      - PRODUCT_SERVICE_URL=productservice:8082
-      - INVENTORY_SERVICE_URL=inventoryservice:8083
-      - CART_SERVICE_URL=cartservice:8084
+      - CONFIG_PROFILE=dev
+      - CONFIG_LABEL=latest
+      - APPLICATION_NAME=orderservice
+      - CONFIG_SERVER=optional:configserver:http://user:password@configserver:9000
+      - SERVICE_PORT:8085
     depends_on:
       - mongodb
+      - configserver
+      - userservice
+      - productservice
+      - inventoryservice
+      - cartservice
+
     networks:
       seeker-network:
     restart: on-failure
 
- 
 volumes:
   mysql_db_data:
   mongo_db_data:
