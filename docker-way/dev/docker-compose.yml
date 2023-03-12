@@ -179,6 +179,29 @@ services:
       seeker-network:
     restart: on-failure
 
+  gatewayserver:
+      image: adminseeker/gateway-server
+      ports:
+        - 9002:9002
+      environment:
+        - APPLICATION_NAME=gatewayserver
+        - CONFIG_SERVER=optional:configserver:http://user:password@configserver:9000
+        - EUREKA_URL=http://eurekaserver:9001/eureka/
+        - SERVER_PORT:9002
+      depends_on:
+        - mysqldb
+        - mongodb
+        - configserver
+        - eurekaserver
+        - userservice
+        - productservice
+        - inventoryservice
+        - cartservice
+        - orderservice
+      networks:
+        seeker-network:
+      restart: on-failure
+
 volumes:
   mysql_db_data:
   mongo_db_data:
