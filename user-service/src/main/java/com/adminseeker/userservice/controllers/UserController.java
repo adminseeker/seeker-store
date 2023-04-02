@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.adminseeker.userservice.entities.EmailRequest;
 import com.adminseeker.userservice.entities.ErrorResponse;
 import com.adminseeker.userservice.entities.User;
+import com.adminseeker.userservice.entities.UserResponse;
 import com.adminseeker.userservice.services.UserService;
 
 
@@ -40,7 +41,7 @@ public class UserController {
     @PostMapping("")
     public ResponseEntity<?> save(@RequestBody User user, @RequestHeader Map<String,String> headers){
         try {
-            ResponseEntity<User> newUser = new ResponseEntity<User>(userService.addUser(user),HttpStatus.CREATED);
+            ResponseEntity<UserResponse> newUser = new ResponseEntity<UserResponse>(userService.addUser(user),HttpStatus.CREATED);
             logger.debug("New User Registered!, User Email: "+user.getEmail()+" correlation-id: "+headers.get("correlation-id"));
             return newUser;
         } catch (Exception e) {
@@ -50,18 +51,15 @@ public class UserController {
         }
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<?> getAll(@RequestHeader Map<String,String> headers){
-        return new ResponseEntity<List<User>>(userService.getUsers(headers),HttpStatus.OK);
-    }
-
-    @GetMapping("/id/{id}")
-    public ResponseEntity<?> getUserById(@PathVariable Long id){
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable Long id,@RequestHeader Map<String,String> headers){
         try {
-            User user = userService.getUserById(id); 
-            return new ResponseEntity<User>(user,HttpStatus.OK);
+            UserResponse user = userService.getUserById(id,headers);
+            logger.debug("User Requested!, User Email: "+user.getEmail()+" correlation-id: "+headers.get("correlation-id"));
+            return new ResponseEntity<UserResponse>(user,HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
+            logger.debug("Error User Requested!: "+e.getMessage()+" correlation-id: "+headers.get("correlation-id"));
             return new ResponseEntity<ErrorResponse>(err,HttpStatus.NOT_FOUND);
         }
     }
@@ -69,10 +67,12 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<?> getUser(@RequestHeader Map<String,String> headers){
         try {
-            User user = userService.getUser(headers); 
-            return new ResponseEntity<User>(user,HttpStatus.OK);
+            UserResponse user = userService.getUser(headers); 
+            logger.debug("User Requested!, User Email: "+user.getEmail()+" correlation-id: "+headers.get("correlation-id"));
+            return new ResponseEntity<UserResponse>(user,HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
+            logger.debug("Error User Requested!: "+e.getMessage()+" correlation-id: "+headers.get("correlation-id"));
             return new ResponseEntity<ErrorResponse>(err,HttpStatus.NOT_FOUND);
         }
     }
@@ -85,31 +85,35 @@ public class UserController {
             return new ResponseEntity<User>(user,HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
-            logger.error("Error Fetching User By Email: "+request.getEmail()+" "+e.getMessage()+" correlation-id: "+headers.get("correlation-id"));
+            logger.debug("Error Fetching User By Email: "+request.getEmail()+" "+e.getMessage()+" correlation-id: "+headers.get("correlation-id"));
             return new ResponseEntity<ErrorResponse>(err,HttpStatus.NOT_FOUND);
         }
     }
 
-    @PatchMapping("/id/{id}")
-    public ResponseEntity<?> updateById(@RequestBody User user, @PathVariable Long id){
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> updateById(@RequestBody User user, @PathVariable Long id, @RequestHeader Map<String,String> headers){
         try{
-            User usrdb = userService.updateUserById(user, id);
-            return new ResponseEntity<User>(usrdb,HttpStatus.OK);
+            UserResponse usrdb = userService.updateUserById(user, id, headers);
+            logger.debug("User Update!, User Email: "+user.getEmail()+" , User Response: "+usrdb.toString() +" correlation-id: "+headers.get("correlation-id"));
+            return new ResponseEntity<UserResponse>(usrdb,HttpStatus.OK);
         }
         catch(Exception e){
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
+            logger.debug("Error User Update!, User Email: "+user.getEmail() +" "+e.getMessage()+ " correlation-id: "+headers.get("correlation-id"));
             return new ResponseEntity<ErrorResponse>(err,HttpStatus.BAD_REQUEST);
 
         }
     }
 
-    @DeleteMapping("/id/{id}")
-    public ResponseEntity<?> DeleteById(@PathVariable Long id){
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> DeleteById(@PathVariable Long id,@RequestHeader Map<String,String> headers){
         try {
-            User user = userService.DeleteUserById(id); 
-            return new ResponseEntity<User>(user,HttpStatus.OK);
+            UserResponse user = userService.DeleteUserById(id,headers);
+            logger.debug("User Delete!, User Email: "+user.getEmail()+" , User Response: "+user.toString() +" correlation-id: "+headers.get("correlation-id"));
+            return new ResponseEntity<UserResponse>(user,HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
+            logger.debug("Error User Delete!, "+e.getMessage()+ " correlation-id: "+headers.get("correlation-id"));
             return new ResponseEntity<ErrorResponse>(err,HttpStatus.NOT_FOUND);
         }
     }

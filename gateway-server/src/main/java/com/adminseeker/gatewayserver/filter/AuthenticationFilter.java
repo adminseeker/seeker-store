@@ -32,6 +32,9 @@ public class AuthenticationFilter implements GlobalFilter  {
     @Autowired
     private WebClient.Builder webClientBuilder;
 
+    @Autowired
+	FilterUtility filterUtility;
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         if (validator.isSecured.test(exchange.getRequest())){
@@ -51,6 +54,7 @@ public class AuthenticationFilter implements GlobalFilter  {
                 .post()
                 .uri("/api/v1/auth/user")
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .header("correlation-id", filterUtility.getCorrelationId(exchange.getRequest().getHeaders()))
                 .accept(MediaType.APPLICATION_JSON)
                 .body(Mono.just(tokenRequest),TokenRequest.class)
                 .retrieve()

@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 
 import com.adminseeker.userservice.entities.EmailRequest;
 import com.adminseeker.userservice.entities.User;
+import com.adminseeker.userservice.entities.UserResponse;
 import com.adminseeker.userservice.exceptions.DuplicateEmailException;
+import com.adminseeker.userservice.exceptions.LoginError;
 import com.adminseeker.userservice.exceptions.ResourceNotFound;
 import com.adminseeker.userservice.exceptions.ResourceUpdateError;
 import com.adminseeker.userservice.repository.UserRepo;
@@ -27,7 +29,7 @@ public class UserService {
     @Autowired
     UserRepo repo;
 
-    public User addUser(User user){
+    public UserResponse addUser(User user){
 
         User userdb = repo.findByEmail(user.getEmail()).orElse(null); 
         
@@ -35,34 +37,62 @@ public class UserService {
 
         if(!user.getRole().equals("buyer") && !user.getRole().equals("seller")) throw new ResourceUpdateError("Invalid User Role!");
         
-        return repo.save(user);
+        User newUser = repo.save(user);
+
+        return UserResponse
+        .builder()
+        .name(newUser.getName())
+        .userId(newUser.getUserId())
+        .role(newUser.getRole())
+        .phone(newUser.getPhone())
+        .email(newUser.getEmail())
+        .createdDate(newUser.getCreatedDate())
+        .modifiedDate(newUser.getModifiedDate())
+        .build();
+
     }
 
-    public List<User> getUsers(Map<String,String> headers){
-        return repo.findAll();
-    }
-
-    public User getUserById(Long id){
+    public UserResponse getUserById(Long id,Map<String,String> headers){
         User user = repo.findById(id).orElseThrow(()-> new ResourceNotFound("User Not Found!"));
-        return user;
+        if(!user.getEmail().equals(headers.get("x-auth-user-email"))) throw new LoginError("Unauthorised User!");
+        return UserResponse
+        .builder()
+        .name(user.getName())
+        .userId(user.getUserId())
+        .role(user.getRole())
+        .phone(user.getPhone())
+        .email(user.getEmail())
+        .addressList(user.getAddressList())
+        .createdDate(user.getCreatedDate())
+        .modifiedDate(user.getModifiedDate())
+        .build();
         
     }
 
-    public User getUser(Map<String,String> headers){
+    public UserResponse getUser(Map<String,String> headers){
         User user = repo.findByEmail(headers.get("x-auth-user-email")).orElseThrow(()-> new ResourceNotFound("User Not Found!"));
-        return user;
-        
+        return UserResponse
+        .builder()
+        .name(user.getName())
+        .userId(user.getUserId())
+        .role(user.getRole())
+        .phone(user.getPhone())
+        .email(user.getEmail())
+        .addressList(user.getAddressList())
+        .createdDate(user.getCreatedDate())
+        .modifiedDate(user.getModifiedDate())
+        .build();
     }
 
     public User getUserByEmail(EmailRequest request){
         User user = repo.findByEmail(request.getEmail()).orElseThrow(()-> new ResourceNotFound("User Not Found!"));
         return user;
-        
     }
 
-    public User updateUserById(User user,Long id) throws Exception{
+    public UserResponse updateUserById(User user,Long id,Map<String,String> headers) throws Exception{
         
         User userdb = repo.findById(id).orElseThrow(()->new ResourceNotFound("User Not Found!"));
+        if(!userdb.getEmail().equals(headers.get("x-auth-user-email"))) throw new LoginError("Unauthorised User!");
         
         if(user.getEmail()!=null){
             throw new ResourceUpdateError("Email Change Is Not Allowed!");
@@ -85,14 +115,35 @@ public class UserService {
         if(user.getPhone()!=null){
             userdb.setPhone(user.getPhone());
         }
-
-        return repo.save(userdb);
+        User updatedUser = repo.save(userdb);
+        return UserResponse
+        .builder()
+        .name(updatedUser.getName())
+        .userId(updatedUser.getUserId())
+        .role(updatedUser.getRole())
+        .phone(updatedUser.getPhone())
+        .email(updatedUser.getEmail())
+        .addressList(updatedUser.getAddressList())
+        .createdDate(updatedUser.getCreatedDate())
+        .modifiedDate(updatedUser.getModifiedDate())
+        .build(); 
         
     }
 
-    public User DeleteUserById(Long id){
+    public UserResponse DeleteUserById(Long id,Map<String,String> headers){
         User user = repo.findById(id).orElseThrow(()-> new ResourceNotFound("User Not Found!"));
+        if(!user.getEmail().equals(headers.get("x-auth-user-email"))) throw new LoginError("Unauthorised User!");
         repo.delete(user);
-        return user;        
+        return UserResponse
+        .builder()
+        .name(user.getName())
+        .userId(user.getUserId())
+        .role(user.getRole())
+        .phone(user.getPhone())
+        .email(user.getEmail())
+        .addressList(user.getAddressList())
+        .createdDate(user.getCreatedDate())
+        .modifiedDate(user.getModifiedDate())
+        .build();        
     }
 }
