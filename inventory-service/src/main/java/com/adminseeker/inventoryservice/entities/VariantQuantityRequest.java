@@ -5,6 +5,6 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class QuantityUpdateRequest {
-    List<QuantityUpdate> quantityUpdates;
+public class VariantQuantityRequest {
+    List<VariantQuantity> quantityUpdates;
 }

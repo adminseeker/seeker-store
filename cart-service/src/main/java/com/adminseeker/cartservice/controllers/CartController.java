@@ -1,5 +1,7 @@
 package com.adminseeker.cartservice.controllers;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,9 +33,10 @@ public class CartController {
     CartService cartService;
 
     @PostMapping("")
-    public ResponseEntity<?> save(@RequestBody CartRequest cartrequest){
+    public ResponseEntity<?> save(@RequestHeader Map<String,String> headers, @RequestBody CartRequest cartrequest){
         try {
-        return new ResponseEntity<Cart>(cartService.addItems(cartrequest),HttpStatus.CREATED);
+            headers.remove("content-length");
+            return new ResponseEntity<Cart>(cartService.addItems(headers,cartrequest),HttpStatus.CREATED);
             
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
@@ -40,10 +44,11 @@ public class CartController {
         }
     }
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<?> getAll(@PathVariable Long userId){
+    @GetMapping("")
+    public ResponseEntity<?> getAll(@RequestHeader Map<String,String> headers){
         try {
-            return new ResponseEntity<CartResponse>(cartService.getCart(userId),HttpStatus.OK);
+            headers.remove("content-length");
+            return new ResponseEntity<CartResponse>(cartService.getCart(headers),HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
             return new ResponseEntity<ErrorResponse>(err,HttpStatus.NOT_FOUND);
@@ -51,9 +56,10 @@ public class CartController {
     }
 
     @PutMapping("/item/{itemId}")
-    public ResponseEntity<?> updateById(@RequestBody CartRequest cartrequest, @PathVariable String itemId){
+    public ResponseEntity<?> updateById(@RequestHeader Map<String,String> headers,@RequestBody CartRequest cartrequest, @PathVariable String itemId){
         try{
-            Cart cartResult = cartService.updateItemById(cartrequest,itemId);
+            headers.remove("content-length");
+            Cart cartResult = cartService.updateItemById(headers,cartrequest,itemId);
             return new ResponseEntity<Cart>(cartResult,HttpStatus.OK);
         }
         catch(Exception e){
@@ -64,9 +70,10 @@ public class CartController {
     }
 
     @DeleteMapping("/item/{itemId}")
-    public ResponseEntity<?> DeleteItemById(@PathVariable String itemId, @RequestBody CartRequest cartrequest){
+    public ResponseEntity<?> DeleteItemById(@RequestHeader Map<String,String> headers,@PathVariable String itemId){
         try {
-            Cart cart = cartService.deleteItemById(cartrequest,itemId);
+            headers.remove("content-length");
+            Cart cart = cartService.deleteItemById(headers,itemId);
             return new ResponseEntity<Cart>(cart,HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
@@ -75,9 +82,10 @@ public class CartController {
     }
 
     @DeleteMapping("")
-    public ResponseEntity<?> clearCart(@RequestBody CartRequest cartrequest){
+    public ResponseEntity<?> clearCart(@RequestHeader Map<String,String> headers){
         try {
-            Cart cart = cartService.clearCart(cartrequest);
+            headers.remove("content-length");
+            Cart cart = cartService.clearCart(headers);
             return new ResponseEntity<Cart>(cart,HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();

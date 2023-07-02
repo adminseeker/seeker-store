@@ -14,7 +14,7 @@ import com.adminseeker.authservice.proxies.User;
 @FeignClient("userservice")
 public interface UserServiceRequest {
 
-    @PostMapping("/api/v1/users/getuser")
+    @PostMapping("/api/v1/users/inapi/getuser")
     Optional<User> getUserByEmail(@RequestBody EmailRequest request, @RequestHeader Map<String,String> headers);
 
     @PostMapping("/api/v1/users")

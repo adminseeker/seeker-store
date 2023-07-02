@@ -2,6 +2,7 @@ package com.adminseeker.productservice.controllers;
 
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,12 +14,12 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.adminseeker.productservice.entities.ErrorResponse;
 import com.adminseeker.productservice.entities.Product;
-import com.adminseeker.productservice.entities.ProductRequest;
 import com.adminseeker.productservice.entities.ProductResponse;
 import com.adminseeker.productservice.services.ProductService;
 
@@ -32,9 +33,11 @@ public class ProductController {
     ProductService productService;
 
     @PostMapping("")
-    public ResponseEntity<?> save(@RequestBody Product product){
+    public ResponseEntity<?> save(@RequestHeader Map<String,String> headers,@RequestBody Product product ){
         try {
-        return new ResponseEntity<Product>(productService.addProduct(product),HttpStatus.CREATED);
+            headers.remove("content-length");
+            Product newProduct = productService.addProduct(product,headers);
+            return new ResponseEntity<Product>(newProduct,HttpStatus.CREATED);
             
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
@@ -42,15 +45,18 @@ public class ProductController {
         }
     }
 
-    @GetMapping("")
-    public ResponseEntity<?> getAll(){
-        return new ResponseEntity<List<Product>>(productService.getProducts(),HttpStatus.OK);
+    @GetMapping("/public")
+    public ResponseEntity<?> getAllProducts(@RequestHeader Map<String,String> headers){
+        headers.remove("content-length");
+        List<Product> products = productService.getAllProducts(headers);
+        return new ResponseEntity<List<Product>>(products,HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getProductById(@PathVariable Long id){
+    @GetMapping("/public/{id}")
+    public ResponseEntity<?> getProductById(@RequestHeader Map<String,String> headers,@PathVariable Long id){
         try {
-            ProductResponse productResponse = productService.getProductById(id); 
+            headers.remove("content-length");
+            ProductResponse productResponse = productService.getProductById(id,headers); 
             return new ResponseEntity<ProductResponse>(productResponse,HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
@@ -58,10 +64,24 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/skucode/{skucode}")
-    public ResponseEntity<?> getProductBySkuCode(@PathVariable String skucode){
+    @GetMapping("/public/seller/{sellerId}")
+    public ResponseEntity<?> getProductBySeller(@RequestHeader Map<String,String> headers,@PathVariable Long sellerId){
         try {
-            ProductResponse productResponse = productService.getProductBySkucode(skucode); 
+            headers.remove("content-length");
+            List<Product> products = productService.getProductsBySeller(sellerId,headers);
+            return new ResponseEntity<List<Product>>(products,HttpStatus.OK);
+        } catch (Exception e) {
+            ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
+            return new ResponseEntity<ErrorResponse>(err,HttpStatus.NOT_FOUND);
+        }
+    }
+
+
+    @GetMapping("/public/skucode/{skucode}")
+    public ResponseEntity<?> getProductBySkuCode(@RequestHeader Map<String,String> headers,@PathVariable String skucode){
+        try {
+            headers.remove("content-length");
+            ProductResponse productResponse = productService.getProductBySkucode(skucode,headers);
             return new ResponseEntity<ProductResponse>(productResponse,HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
@@ -70,9 +90,10 @@ public class ProductController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateById(@RequestBody Product product, @PathVariable Long id){
+    public ResponseEntity<?> updateById(@RequestHeader Map<String,String> headers,@RequestBody Product product, @PathVariable Long id){
         try{
-            Product productDb = productService.updateProductById(product, id);
+            headers.remove("content-length");
+            Product productDb = productService.updateProductById(product, id,headers);
             return new ResponseEntity<Product>(productDb,HttpStatus.OK);
         }
         catch(Exception e){
@@ -83,9 +104,10 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> DeleteById(@PathVariable Long id, @RequestBody ProductRequest productRequest){
+    public ResponseEntity<?> DeleteById(@RequestHeader Map<String,String> headers,@PathVariable Long id){
         try {
-            Product product = productService.DeleteProductById(id,productRequest); 
+            headers.remove("content-length");
+            Product product = productService.DeleteProductById(id,headers);
             return new ResponseEntity<Product>(product,HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();

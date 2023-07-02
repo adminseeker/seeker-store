@@ -10,6 +10,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 
+import com.adminseeker.gatewayserver.utils.CorrelationIDHandler;
+
 import reactor.core.publisher.Mono;
 
 
@@ -23,16 +25,17 @@ public class CorrelationFilter implements GlobalFilter  {
 	@Autowired
 	FilterUtility filterUtility;
 
+	@Autowired
+	CorrelationIDHandler correlationIDHandler;
+
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 		HttpHeaders requestHeaders = exchange.getRequest().getHeaders();
 		if (isCorrelationIdPresent(requestHeaders)) {
-			logger.debug("correlation-id found: {}. ",
-					filterUtility.getCorrelationId(requestHeaders));
 		} else {
 			String correlationID = generateCorrelationId();
 			exchange = filterUtility.setCorrelationId(exchange, correlationID);
-			logger.debug("correlation-id generated: {}.", correlationID);
+			logger.info("correlation-id generated: {}.", correlationID);
 		}
 		return chain.filter(exchange);
 	}
@@ -46,6 +49,6 @@ public class CorrelationFilter implements GlobalFilter  {
 	}
 
 	private String generateCorrelationId() {
-		return java.util.UUID.randomUUID().toString();
+		return correlationIDHandler.getCorrelationId();
 	}
 }

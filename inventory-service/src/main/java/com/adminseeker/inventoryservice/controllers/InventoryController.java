@@ -2,6 +2,7 @@ package com.adminseeker.inventoryservice.controllers;
 
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,16 +15,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.adminseeker.inventoryservice.entities.ErrorResponse;
 import com.adminseeker.inventoryservice.entities.Inventory;
-import com.adminseeker.inventoryservice.entities.InventoryRequest;
 import com.adminseeker.inventoryservice.entities.InventoryResponse;
+import com.adminseeker.inventoryservice.entities.ProductQuantity;
+import com.adminseeker.inventoryservice.entities.ProductQuantityRequest;
 import com.adminseeker.inventoryservice.entities.QuantityResponse;
-import com.adminseeker.inventoryservice.entities.QuantityUpdate;
-import com.adminseeker.inventoryservice.entities.QuantityUpdateRequest;
 import com.adminseeker.inventoryservice.services.InventoryService;
 
 
@@ -31,14 +32,16 @@ import com.adminseeker.inventoryservice.services.InventoryService;
 @RestController
 @RequestMapping("/api/v1/inventory")
 public class InventoryController {
-    
+
     @Autowired
     InventoryService inventoryService;
 
     @PostMapping("")
-    public ResponseEntity<?> save(@RequestBody Inventory inventory){
+    public ResponseEntity<?> save(@RequestHeader Map<String,String> headers,@RequestBody Inventory inventory){
         try {
-        return new ResponseEntity<Inventory>(inventoryService.addInventory(inventory),HttpStatus.CREATED);
+            headers.remove("content-length");
+            Inventory newInventory = inventoryService.addInventory(inventory,headers);
+            return new ResponseEntity<Inventory>(newInventory,HttpStatus.CREATED);
             
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
@@ -46,15 +49,17 @@ public class InventoryController {
         }
     }
 
-    @GetMapping("")
-    public ResponseEntity<?> getAll(){
-        return new ResponseEntity<List<Inventory>>(inventoryService.getInventory(),HttpStatus.OK);
+    @GetMapping("/inapi")
+    public ResponseEntity<?> getAll(@RequestHeader Map<String,String> headers){
+        headers.remove("content-length");
+        return new ResponseEntity<List<Inventory>>(inventoryService.getInventory(headers),HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getInventoryById(@PathVariable Long id){
+    @GetMapping("/public/{id}")
+    public ResponseEntity<?> getInventoryById(@RequestHeader Map<String,String> headers,@PathVariable Long id){
         try {
-            InventoryResponse inventoryResponse = inventoryService.getInventoryById(id); 
+            headers.remove("content-length");
+            InventoryResponse inventoryResponse = inventoryService.getInventoryById(id,headers);
             return new ResponseEntity<InventoryResponse>(inventoryResponse,HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
@@ -62,10 +67,11 @@ public class InventoryController {
         }
     }
 
-    @GetMapping("/skucode/{skucode}")
-    public ResponseEntity<?> getInventoryBySkuCode(@PathVariable String skucode){
+    @GetMapping("/public/skucode/{skucode}")
+    public ResponseEntity<?> getInventoryBySkuCode(@RequestHeader Map<String,String> headers,@PathVariable String skucode){
         try {
-            InventoryResponse inventoryResponse = inventoryService.getInventoryBySkucode(skucode); 
+            headers.remove("content-length");
+            InventoryResponse inventoryResponse = inventoryService.getInventoryBySkucode(skucode,headers); 
             return new ResponseEntity<InventoryResponse>(inventoryResponse,HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
@@ -73,10 +79,11 @@ public class InventoryController {
         }
     }
 
-    @GetMapping("/skucode/{skucode}/quantity")
-    public ResponseEntity<?> getProductQuantityBySkuCode(@PathVariable String skucode){
+    @GetMapping("/public/skucode/{skucode}/quantity")
+    public ResponseEntity<?> getProductQuantityBySkuCode(@RequestHeader Map<String,String> headers,@PathVariable String skucode){
         try {
-            QuantityResponse quantityResponse = inventoryService.getProductQuantityBySkucode(skucode); 
+            headers.remove("content-length");
+            QuantityResponse quantityResponse = inventoryService.getProductQuantityBySkucode(skucode,headers); 
             return new ResponseEntity<QuantityResponse>(quantityResponse,HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
@@ -84,11 +91,12 @@ public class InventoryController {
         }
     }
 
-    @PostMapping("/skucode/getquantity")
-    public ResponseEntity<?> getProductQuantityBySkuCodes(@RequestBody QuantityUpdateRequest quantityUpdateRequest){
+    @PostMapping("/public/skucode/getquantity")
+    public ResponseEntity<?> getProductQuantityBySkuCodes(@RequestHeader Map<String,String> headers,@RequestBody ProductQuantityRequest productQuantityRequest){
         try {
-            List<QuantityUpdate> updates = inventoryService.getInventoryQuantityBySkuCodes(quantityUpdateRequest); 
-            return new ResponseEntity<List<QuantityUpdate>>(updates,HttpStatus.OK);
+            headers.remove("content-length");
+            List<ProductQuantity> updates = inventoryService.getInventoryQuantityBySkuCodes(productQuantityRequest,headers); 
+            return new ResponseEntity<List<ProductQuantity>>(updates,HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
             return new ResponseEntity<ErrorResponse>(err,HttpStatus.NOT_FOUND);
@@ -97,9 +105,10 @@ public class InventoryController {
     
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateById(@RequestBody Inventory inventory, @PathVariable Long id){
+    public ResponseEntity<?> updateById(@RequestHeader Map<String,String> headers,@RequestBody Inventory inventory, @PathVariable Long id){
         try{
-            Inventory inventoryDb = inventoryService.updateInventoryById(inventory, id);
+            headers.remove("content-length");
+            Inventory inventoryDb = inventoryService.updateInventoryById(inventory, id,headers);
             return new ResponseEntity<Inventory>(inventoryDb,HttpStatus.OK);
         }
         catch(Exception e){
@@ -109,11 +118,12 @@ public class InventoryController {
         }
     }
 
-    @PutMapping("/skucode/quantity")
-    public ResponseEntity<?> updateProductQuantityBySkuCodes(@RequestBody QuantityUpdateRequest quantityUpdateRequest){
+    @PutMapping("/inapi/skucode/quantity")
+    public ResponseEntity<?> updateProductQuantityBySkuCodes(@RequestHeader Map<String,String> headers,@RequestBody ProductQuantityRequest productQuantityRequest){
         try {
-            List<QuantityUpdate> updates = inventoryService.updateInventoryQuantityBySkuCodes(quantityUpdateRequest);
-            return new ResponseEntity<List<QuantityUpdate>>(updates,HttpStatus.OK);
+            headers.remove("content-length");
+            List<ProductQuantity> updates = inventoryService.updateInventoryQuantityBySkuCodes(productQuantityRequest,headers);
+            return new ResponseEntity<List<ProductQuantity>>(updates,HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
             return new ResponseEntity<ErrorResponse>(err,HttpStatus.NOT_FOUND);
@@ -121,9 +131,10 @@ public class InventoryController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> DeleteById(@PathVariable Long id, @RequestBody InventoryRequest inventoryRequest){
+    public ResponseEntity<?> DeleteById(@RequestHeader Map<String,String> headers,@PathVariable Long id){
         try {
-            Inventory inventory = inventoryService.DeleteInventoryById(id,inventoryRequest); 
+            headers.remove("content-length");
+            Inventory inventory = inventoryService.DeleteInventoryById(id,headers); 
             return new ResponseEntity<Inventory>(inventory,HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();

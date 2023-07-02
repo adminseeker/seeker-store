@@ -1,7 +1,5 @@
 package com.adminseeker.gatewayserver.filter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -12,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 
+import com.adminseeker.gatewayserver.exceptions.DenyAccess;
 import com.adminseeker.gatewayserver.exceptions.LoginError;
 import com.adminseeker.gatewayserver.proxies.TokenRequest;
 import com.adminseeker.gatewayserver.proxies.UserTokenEmail;
@@ -24,7 +23,6 @@ import reactor.core.publisher.Mono;
 @Order(2)
 public class AuthenticationFilter implements GlobalFilter  {
 
-    private static Logger logger = LoggerFactory.getLogger(AuthenticationFilter.class);
 
     @Autowired
     private RouteValidator validator;
@@ -37,9 +35,15 @@ public class AuthenticationFilter implements GlobalFilter  {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        // logger.info("Request Headers: "+exchange.getRequest().getHeaders());
+        // logger.info("Request Body: "+exchange.getRequest().getBody());
+        // LoggingFilter loggingFilter = new LoggingFilter(null);
+        if(exchange.getRequest().getPath().toString().toLowerCase().contains("inapi")){
+            throw new DenyAccess("NOT ALLOWED");
+        }
         if (validator.isSecured.test(exchange.getRequest())){
             if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
-                logger.debug("missing authorization header");
+                // logger.debug("missing authorization header");
                 throw new LoginError("missing authorization header");
             }
             String authHeader = exchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
@@ -60,18 +64,20 @@ public class AuthenticationFilter implements GlobalFilter  {
                 .retrieve()
                 .bodyToMono(UserTokenEmail.class)
                 .map(userTokenEmail -> {
-                    logger.debug("User Email: "+userTokenEmail.getEmail());
+                    // logger.debug("User Email: "+userTokenEmail.getEmail());
                     exchange.getRequest()
                             .mutate()
                             .header("X-auth-user-email", String.valueOf(userTokenEmail.getEmail()));
                     return exchange;
                 })
                 .onErrorResume(e -> {
-                    logger.debug("Invalid Token");
+                    // logger.debug("Invalid Token");
                     return Mono.error(new LoginError("Invalid Token"));
                 })
                 .flatMap(chain::filter);
         }
+        // loggingFilter.filter(exchange, chain);
         return chain.filter(exchange);
     };
+
 }
