@@ -11,9 +11,9 @@ import com.adminseeker.cartservice.proxies.QuantityResponse;
 @FeignClient("inventoryservice")
 public interface InventoryServiceRequest {
     
-    @GetMapping("/api/v1/inventory/skucode/{skucode}/quantity")
+    @GetMapping("/api/v1/inventory/public/skucode/{skucode}/quantity")
     Optional<QuantityResponse> getProductQuantityBySkucode(@PathVariable("skucode") String skucode);
 
-    @GetMapping("/api/v1/inventory/skucode/{skucode}/variant/{variantSkucode}/quantity")
+    @GetMapping("/api/v1/inventory/public/skucode/{skucode}/variant/{variantSkucode}/quantity")
     Optional<QuantityResponse> getVariantQuantityBySkucode(@PathVariable("skucode") String skucode,@PathVariable("variantSkucode") String variantSkucode);
 }

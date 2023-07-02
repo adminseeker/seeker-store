@@ -2,6 +2,7 @@ package com.adminseeker.cartservice.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +14,13 @@ import com.adminseeker.cartservice.entities.CartRequest;
 import com.adminseeker.cartservice.entities.CartResponse;
 import com.adminseeker.cartservice.entities.Item;
 import com.adminseeker.cartservice.entities.ItemResponse;
+import com.adminseeker.cartservice.exceptions.LoginError;
 import com.adminseeker.cartservice.exceptions.ResourceNotFound;
 import com.adminseeker.cartservice.exceptions.ResourceUpdateError;
+import com.adminseeker.cartservice.proxies.EmailRequest;
 import com.adminseeker.cartservice.proxies.ProductResponse;
 import com.adminseeker.cartservice.proxies.QuantityResponse;
+import com.adminseeker.cartservice.proxies.User;
 import com.adminseeker.cartservice.proxies.Variant;
 import com.adminseeker.cartservice.repository.CartRepo;
 
@@ -33,9 +37,13 @@ public class CartService {
     @Autowired
     InventoryServiceRequest inventoryServiceRequest;
 
-    public Cart addItems(CartRequest cartrequest){
+    @Autowired
+    UserServiceRequest userServiceRequest;
 
+    public Cart addItems(Map<String,String> headers,CartRequest cartrequest){
+        User user = userServiceRequest.getUserByEmail(EmailRequest.builder().email(headers.get("x-auth-user-email")).build(), headers).orElseThrow(()-> new ResourceNotFound("User Not Found!"));
         Long userId = cartrequest.getUserId();
+        if(!userId.equals(user.getUserId()))  throw new LoginError("Unauthorised User!");
         Item item = cartrequest.getItem();
         if(item==null) throw new ResourceUpdateError("Nothing to Update!");
         Cart cartdb = repo.findByUserId(userId).orElse(null);
@@ -43,7 +51,7 @@ public class CartService {
             cartdb = new Cart();
             cartdb.setUserId(userId);
         }
-        if(userId!=cartdb.getUserId()) throw new ResourceUpdateError("Unauthorised User!");
+        if(userId!=cartdb.getUserId()) throw new LoginError("Unauthorised User!");
         ProductResponse productResponse = productServiceRequest.getProductById(item.getProductId()).orElseThrow(()->new ResourceNotFound("Product Not Found!"));
         Variant variantResponse = null;
         Boolean isVariantPresent=false;
@@ -92,11 +100,13 @@ public class CartService {
     }
 
 
-    public Cart updateItemById(CartRequest cartrequest,String itemId){
+    public Cart updateItemById(Map<String,String> headers, CartRequest cartrequest,String itemId){
+        User user = userServiceRequest.getUserByEmail(EmailRequest.builder().email(headers.get("x-auth-user-email")).build(), headers).orElseThrow(()-> new ResourceNotFound("User Not Found!"));
         Long userId = cartrequest.getUserId();
+        if(!userId.equals(user.getUserId()))  throw new LoginError("Unauthorised User!");
         Item item = cartrequest.getItem();
         Cart cartdb = repo.findByUserId(userId).orElseThrow(()->new ResourceNotFound("Cart Not Found!"));
-        if(userId!=cartdb.getUserId()) throw new ResourceUpdateError("Unauthorised User!");
+        if(userId!=cartdb.getUserId()) throw new LoginError("Unauthorised User!");
         ProductResponse productResponse = productServiceRequest.getProductById(item.getProductId()).orElseThrow(()->new ResourceNotFound("Product Not Found!"));
         Variant variantResponse = null;
         Boolean isVariantPresent=false;
@@ -149,10 +159,11 @@ public class CartService {
         return repo.save(cartdb);
     }
 
-    public Cart deleteItemById(CartRequest cartrequest, String itemId){
-        Long userId = cartrequest.getUserId();
+    public Cart deleteItemById(Map<String,String> headers,String itemId){
+        User user = userServiceRequest.getUserByEmail(EmailRequest.builder().email(headers.get("x-auth-user-email")).build(), headers).orElseThrow(()-> new ResourceNotFound("User Not Found!"));
+        Long userId = user.getUserId();
         Cart cartdb = repo.findByUserId(userId).orElseThrow(()->new ResourceNotFound("Cart Not Found!"));
-        if(userId!=cartdb.getUserId()) throw new ResourceUpdateError("Unauthorised User!");
+        if(userId!=cartdb.getUserId()) throw new LoginError("Unauthorised User!");
         Item item=null;
         List<Item> items=cartdb.getItems();
         Boolean isPresent=false;
@@ -170,12 +181,15 @@ public class CartService {
     }
 
 
-    public CartResponse getCart(Long userId){
-        
-        Cart cartdb = repo.findByUserId(userId).orElseThrow(()->new ResourceNotFound("Cart Not Found"));
+    public CartResponse getCart(Map<String,String> headers){
+        User user = userServiceRequest.getUserByEmail(EmailRequest.builder().email(headers.get("x-auth-user-email")).build(), headers).orElseThrow(()-> new ResourceNotFound("User Not Found!"));
+        Long userId = user.getUserId();
+        Cart cartdb = repo.findByUserId(userId).orElse(null);
         CartResponse cartResponse = new CartResponse();
+        cartResponse.setUserId(userId);
+        if(cartdb==null) return cartResponse;
+        if(!user.getUserId().equals(cartdb.getUserId())) throw new LoginError("Unauthorised User!");
         cartResponse.setCartId(cartdb.getCartId());
-        cartResponse.setUserId(cartdb.getUserId());
         Double totalPrice=0.0;
         List<ItemResponse> itemsResponse = new ArrayList<ItemResponse>();
         if(cartdb.getItems()!=null && cartdb.getItems().size()!=0){
@@ -224,8 +238,9 @@ public class CartService {
         return cartResponse;
     }
 
-    public Cart clearCart(CartRequest cartrequest){
-        Long userId = cartrequest.getUserId();
+    public Cart clearCart(Map<String,String> headers){
+        User user = userServiceRequest.getUserByEmail(EmailRequest.builder().email(headers.get("x-auth-user-email")).build(), headers).orElseThrow(()-> new ResourceNotFound("User Not Found!"));
+        Long userId = user.getUserId();
         Cart cartdb = repo.findByUserId(userId).orElseThrow(()->new ResourceNotFound("Cart Not Found"));
         cartdb.getItems().clear();
         repo.save(cartdb);

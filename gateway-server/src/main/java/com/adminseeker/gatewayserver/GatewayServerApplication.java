@@ -2,9 +2,12 @@ package com.adminseeker.gatewayserver;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
+
 @SpringBootApplication
+@EnableDiscoveryClient
 @EnableEurekaClient
 public class GatewayServerApplication {
 
@@ -12,4 +15,5 @@ public class GatewayServerApplication {
 		SpringApplication.run(GatewayServerApplication.class, args);
 	}
 
+	
 }

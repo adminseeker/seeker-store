@@ -1,6 +1,9 @@
 package com.adminseeker.orderservice.proxies;
 
+import java.time.LocalDateTime;
 import java.util.List;
+
+
 
 import lombok.Data;
 
@@ -12,4 +15,6 @@ public class OrderResponse {
     private Address address;
     private Double totalPrice;
     private List<OrderItemResponse> items;
+    private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
 }

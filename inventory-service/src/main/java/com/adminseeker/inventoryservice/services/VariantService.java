@@ -8,14 +8,18 @@ import com.adminseeker.inventoryservice.entities.Variant;
 import com.adminseeker.inventoryservice.entities.VariantRequest;
 import com.adminseeker.inventoryservice.entities.Inventory;
 import com.adminseeker.inventoryservice.entities.QuantityResponse;
-import com.adminseeker.inventoryservice.entities.QuantityUpdate;
-import com.adminseeker.inventoryservice.entities.QuantityUpdateRequest;
+import com.adminseeker.inventoryservice.entities.VariantQuantity;
+import com.adminseeker.inventoryservice.entities.VariantQuantityRequest;
+import com.adminseeker.inventoryservice.exceptions.LoginError;
 import com.adminseeker.inventoryservice.exceptions.ResourceNotFound;
 import com.adminseeker.inventoryservice.exceptions.ResourceUpdateError;
+import com.adminseeker.inventoryservice.proxies.EmailRequest;
 import com.adminseeker.inventoryservice.proxies.ProductResponse;
+import com.adminseeker.inventoryservice.proxies.User;
 import com.adminseeker.inventoryservice.repository.InventoryRepo;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.transaction.Transactional;
 
@@ -29,11 +33,16 @@ public class VariantService {
     @Autowired
     ProductServiceRequest productServiceRequest;
 
-    public Variant addVariant(Long inventoryId,VariantRequest variantRequest){
+    @Autowired
+    UserServiceRequest userServiceRequest;
+
+    public Variant addVariant(Map<String,String> headers,Long inventoryId,VariantRequest variantRequest){
+        User user = userServiceRequest.getUserByEmail(EmailRequest.builder().email(headers.get("x-auth-user-email")).build(), headers).orElseThrow(()-> new ResourceNotFound("User Not Found!"));
         Variant variant = variantRequest.getVariant();
         Long userId = variantRequest.getUserId();
+        if(!user.getUserId().equals(userId)) throw new LoginError("unauthorised user!");
         Inventory inventorydb = repo.findById(inventoryId).orElseThrow(()->new ResourceNotFound("Inventory Not Found!"));
-        if (!userId.equals(inventorydb.getSellerId())) throw new ResourceUpdateError("Unauthorised User!"); 
+        if (!userId.equals(inventorydb.getSellerId())) throw new ResourceUpdateError("unauthorised user!"); 
         ProductResponse productResponse = productServiceRequest.getProductBySkucode(inventorydb.getSkucode()).orElseThrow(()-> new ResourceNotFound("Product Not Found!"));
         if(productResponse.getProduct().getVariants()==null ) throw new ResourceNotFound("Product Has No Variants!");
 
@@ -101,9 +110,9 @@ public class VariantService {
         return quantityResponse;
     }
 
-    public List<QuantityUpdate> getVariantQuantityBySkucodes(QuantityUpdateRequest quantityUpdateRequest){
-        List<QuantityUpdate> updates =  quantityUpdateRequest.getQuantityUpdates();
-        for(QuantityUpdate update : updates){
+    public List<VariantQuantity> getVariantQuantityBySkucodes(VariantQuantityRequest quantityUpdateRequest){
+        List<VariantQuantity> updates =  quantityUpdateRequest.getQuantityUpdates();
+        for(VariantQuantity update : updates){
             Inventory inventorydb = repo.findBySkucode(update.getProductSkucode()).orElseThrow(()->new ResourceNotFound("Inventory Not Found!"));
             if(inventorydb.getQuantity()<0) throw new ResourceUpdateError("invalid quantity!");
 
@@ -116,7 +125,7 @@ public class VariantService {
             Variant variant=null;
             for (Variant v : variantsdb){
                 if(v.getVariantSkucode().equals(update.getVariantSkucode())){
-                    Integer index = variantsdb.indexOf(v);
+                    // Integer index = variantsdb.indexOf(v);
                     update.setQuantity(v.getQuantity());
                     variant=v;
                     isPresent=true;
@@ -129,11 +138,13 @@ public class VariantService {
         return updates;
     }
 
-    public Variant UpdateVariantById(Long inventoryId,VariantRequest variantRequest,Long variantId){
-        Long userId=variantRequest.getUserId();
+    public Variant UpdateVariantById(Map<String,String> headers,Long inventoryId,VariantRequest variantRequest,Long variantId){
+        User user = userServiceRequest.getUserByEmail(EmailRequest.builder().email(headers.get("x-auth-user-email")).build(), headers).orElseThrow(()-> new ResourceNotFound("User Not Found!"));
+        Long userId=user.getUserId();
+        if (!userId.equals(user.getUserId())) throw new LoginError("Unauthorised User!");
         Variant variant=variantRequest.getVariant();
         Inventory inventorydb = repo.findById(inventoryId).orElseThrow(()->new ResourceNotFound("Inventory Not Found!"));
-        if (!userId.equals(inventorydb.getSellerId())) throw new ResourceUpdateError("Unauthorised User!");
+        if (!userId.equals(inventorydb.getSellerId())) throw new LoginError("Unauthorised User!");
 
         List<Variant> variantsdb = inventorydb.getVariants();
         if(variant==null) throw new ResourceUpdateError("Nothing to update!");
@@ -177,9 +188,9 @@ public class VariantService {
         return variant;
     }
 
-    public List<QuantityUpdate> UpdateVariantQuantityBySkucodes(QuantityUpdateRequest quantityUpdateRequest){
-        List<QuantityUpdate> updates =  quantityUpdateRequest.getQuantityUpdates();
-        for(QuantityUpdate update : updates){
+    public List<VariantQuantity> UpdateVariantQuantityBySkucodes(VariantQuantityRequest quantityUpdateRequest){
+        List<VariantQuantity> updates =  quantityUpdateRequest.getQuantityUpdates();
+        for(VariantQuantity update : updates){
             Inventory inventorydb = repo.findBySkucode(update.getProductSkucode()).orElseThrow(()->new ResourceNotFound("Inventory Not Found!"));
             if(update.getQuantity()<0) throw new ResourceUpdateError("invalid quantity!");
 
@@ -209,10 +220,10 @@ public class VariantService {
     }
 
 
-    public Variant deleteVariantById(Long inventoryId,Long variantId,VariantRequest variantRequest){
-        Long userId=variantRequest.getUserId();
+    public Variant deleteVariantById(Map<String,String> headers,Long inventoryId,Long variantId){
+        User user = userServiceRequest.getUserByEmail(EmailRequest.builder().email(headers.get("x-auth-user-email")).build(), headers).orElseThrow(()-> new ResourceNotFound("User Not Found!"));
         Inventory inventorydb = repo.findById(inventoryId).orElseThrow(()->new ResourceNotFound("Inventory Not Found!"));
-        if (!userId.equals(inventorydb.getSellerId())) throw new ResourceUpdateError("Unauthorised User!");
+        if (!user.getUserId().equals(inventorydb.getSellerId())) throw new ResourceUpdateError("Unauthorised User!");
         List<Variant> variants = inventorydb.getVariants();
         Variant variant=null;
         Boolean isPresent = false;

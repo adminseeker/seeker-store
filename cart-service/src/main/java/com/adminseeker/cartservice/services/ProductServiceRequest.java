@@ -11,9 +11,9 @@ import com.adminseeker.cartservice.proxies.ProductResponse;
 @FeignClient("productservice")
 public interface ProductServiceRequest {
 
-    @GetMapping("/api/v1/products/skucode/{skucode}")
+    @GetMapping("/api/v1/products/public/skucode/{skucode}")
     Optional<ProductResponse> getProductBySkucode(@PathVariable("skucode") String skucode);
 
-    @GetMapping("/api/v1/products/{productId}")
+    @GetMapping("/api/v1/products/public/{productId}")
     Optional<ProductResponse> getProductById(@PathVariable("productId") Long productId);
 }
