@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+ <springproperty scope="context" name="RMQ_HOST" source="app.rabbitmq.host" />
+ <springproperty scope="context" name="RMQ_PORT" source="app.rabbitmq.port" />
+ <springproperty scope="context" name="RMQ_USER" source="app.rabbitmq.username" />
+ <springproperty scope="context" name="RMQ_PASSWORD" source="app.rabbitmq.password" />
+ <springproperty scope="context" name="RMQ_EXCHANGE" source="app.rabbitmq.exchange" />
+ <springproperty scope="context" name="RMQ_ROUTING_PATTERN" source="app.rabbitmq.routing.pattern" />
+ <springproperty scope="context" name="RMQ_DELIVERY_MODE" source="app.rabbitmq.delivery.mode" />
+ <springproperty scope="context" name="APPLICATION_NAME" source="spring.application.name" />
+
+    <appender name="AMQP" class="org.springframework.amqp.rabbit.logback.AmqpAppender">        
+        <layout>            
+            <pattern>
+                 <pattern>
+                        {
+                        "timestamp": "@timestamp",
+                        "severity": "%level",
+                        "service": "${APPLICATION_NAME}
+                        "spanid": "%X{spanId}",
+                        "traceid": "%X{traceId}",
+                        "pid": "${PID}",
+                        "thread": "%thread",
+                        "class": "%logger{40}",
+                        "message": "%message"
+                        }
+                    </pattern>
+            </pattern>        
+            </layout>        
+            <exchangeName>${RMQ_EXCHANGE}</exchangeName>        
+            <host>${RMQ_HOST}</host>        
+            <port>${RMQ_PORT}</port>        
+            <username>${RMQ_USER}</username>        
+            <password>${RMQ_PASSWORD}</password>        
+            <exchangeType>queue</exchangeType>        
+            <applicationId>${APPLICATION_NAME}</applicationId>        
+            <routingKeyPattern>${RMQ_ROUTING_PATTERN}</routingKeyPattern>        
+            <generateId>true</generateId>        
+            <charset>UTF-8</charset>        
+            <durable>false</durable>        
+            <deliveryMode>${RMQ_DELIVERY_MODE}</deliveryMode>    
+        </appender>    
+
+          <root level="info">        
+          <appender-ref ref="AMQP" />    
+          </root>
+</configuration>

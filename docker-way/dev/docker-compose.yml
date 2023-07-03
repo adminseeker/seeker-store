@@ -69,6 +69,48 @@ services:
       networks:
         seeker-network:
       restart: on-failure
+  
+  rabbitmq:
+      image: rabbitmq:management
+      ports:
+        - 5672:5672
+        - 15672:15672
+      hostname: rabbitmq
+      volumes:
+        - rabbitmq_data:/var/lib/rabbitmq
+      networks:
+        seeker-network:
+      restart: on-failure
+
+  authservice:
+    image: adminseeker/auth-service
+    ports:
+      - 8090:8090
+    environment:
+      - CONFIG_PROFILE=dev
+      - CONFIG_LABEL=latest
+      - APPLICATION_NAME=authservice
+      - CONFIG_SERVER=optional:configserver:http://user:password@configserver:9000
+      - EUREKA_URL=http://eurekaserver:9001/eureka/
+      - RABBITMQ_HOSTNAME=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+      - RABBITMQ_EXCHANGE=seeker-store-exchange
+      - RABBITMQ_ROUTING_PATTERN=seeker-store-logs
+      - RABBITMQ_DELIVERY_MODE=NON_PERSISTENT
+      - VERSION=1.0.1
+      - SERVICE_PORT:8090
+    depends_on:
+      - mysqldb
+      - configserver
+      - rabbitmq
+      - eurekaserver
+      - userservice
+    networks:
+      seeker-network:
+    restart: on-failure
+  
   userservice:
     image: adminseeker/user-service
     ports:
@@ -79,11 +121,19 @@ services:
       - APPLICATION_NAME=userservice
       - CONFIG_SERVER=optional:configserver:http://user:password@configserver:9000
       - EUREKA_URL=http://eurekaserver:9001/eureka/
+      - RABBITMQ_HOSTNAME=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+      - RABBITMQ_EXCHANGE=seeker-store-exchange
+      - RABBITMQ_ROUTING_PATTERN=seeker-store-logs
+      - RABBITMQ_DELIVERY_MODE=NON_PERSISTENT
       - VERSION=1.0.1
       - SERVICE_PORT:8081
     depends_on:
       - mysqldb
       - configserver
+      - rabbitmq
       - eurekaserver
     networks:
       seeker-network:
@@ -99,13 +149,22 @@ services:
       - APPLICATION_NAME=productservice
       - CONFIG_SERVER=optional:configserver:http://user:password@configserver:9000
       - EUREKA_URL=http://eurekaserver:9001/eureka/
+      - RABBITMQ_HOSTNAME=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+      - RABBITMQ_EXCHANGE=seeker-store-exchange
+      - RABBITMQ_ROUTING_PATTERN=seeker-store-logs
+      - RABBITMQ_DELIVERY_MODE=NON_PERSISTENT
       - VERSION=1.0.1
       - SERVICE_PORT:8082
     depends_on:
       - mysqldb
       - configserver
+      - rabbitmq
       - eurekaserver
-      # - userservice
+      - userservice
+      - authservice
     networks:
       seeker-network:
     restart: on-failure
@@ -120,13 +179,22 @@ services:
       - APPLICATION_NAME=inventoryservice
       - CONFIG_SERVER=optional:configserver:http://user:password@configserver:9000
       - EUREKA_URL=http://eurekaserver:9001/eureka/
+      - RABBITMQ_HOSTNAME=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+      - RABBITMQ_EXCHANGE=seeker-store-exchange
+      - RABBITMQ_ROUTING_PATTERN=seeker-store-logs
+      - RABBITMQ_DELIVERY_MODE=NON_PERSISTENT
       - VERSION=1.0.1
       - SERVICE_PORT:8083
     depends_on:
       - mysqldb
       - configserver
+      - rabbitmq
       - eurekaserver
-      # - userservice
+      - userservice
+      - authservice
       - productservice
     networks:
       seeker-network:
@@ -142,13 +210,22 @@ services:
       - APPLICATION_NAME=cartservice
       - CONFIG_SERVER=optional:configserver:http://user:password@configserver:9000
       - EUREKA_URL=http://eurekaserver:9001/eureka/
+      - RABBITMQ_HOSTNAME=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+      - RABBITMQ_EXCHANGE=seeker-store-exchange
+      - RABBITMQ_ROUTING_PATTERN=seeker-store-logs
+      - RABBITMQ_DELIVERY_MODE=NON_PERSISTENT
       - VERSION=1.0.1
       - SERVICE_PORT:8084
     depends_on:
       - mongodb
       - configserver
       - eurekaserver
-      # - userservice
+      - rabbitmq
+      - userservice
+      - authservice
       - productservice
       - inventoryservice
     networks:
@@ -165,37 +242,25 @@ services:
       - APPLICATION_NAME=orderservice
       - CONFIG_SERVER=optional:configserver:http://user:password@configserver:9000
       - EUREKA_URL=http://eurekaserver:9001/eureka/
+      - RABBITMQ_HOSTNAME=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+      - RABBITMQ_EXCHANGE=seeker-store-exchange
+      - RABBITMQ_ROUTING_PATTERN=seeker-store-logs
+      - RABBITMQ_DELIVERY_MODE=NON_PERSISTENT
       - VERSION=1.0.1
       - SERVICE_PORT:8085
     depends_on:
       - mongodb
       - configserver
       - eurekaserver
-      # - userservice
+      - rabbitmq
+      - userservice
+      - authservice
       - productservice
       - inventoryservice
       - cartservice
-    networks:
-      seeker-network:
-    restart: on-failure
-
-  authservice:
-    image: adminseeker/auth-service
-    ports:
-      - 8090:8090
-    environment:
-      - CONFIG_PROFILE=dev
-      - CONFIG_LABEL=latest
-      - APPLICATION_NAME=authservice
-      - CONFIG_SERVER=optional:configserver:http://user:password@configserver:9000
-      - EUREKA_URL=http://eurekaserver:9001/eureka/
-      - VERSION=1.0.1
-      - SERVICE_PORT:8090
-    depends_on:
-      - mysqldb
-      - configserver
-      - eurekaserver
-      # - userservice
     networks:
       seeker-network:
     restart: on-failure
@@ -208,13 +273,26 @@ services:
         - APPLICATION_NAME=gatewayserver
         - CONFIG_SERVER=optional:configserver:http://user:password@configserver:9000
         - EUREKA_URL=http://eurekaserver:9001/eureka/
+        - RABBITMQ_HOSTNAME=rabbitmq
+        - RABBITMQ_PORT=5672
+        - RABBITMQ_USERNAME=guest
+        - RABBITMQ_PASSWORD=guest
+        - RABBITMQ_EXCHANGE=seeker-store-exchange
+        - RABBITMQ_ROUTING_PATTERN=seeker-store-logs
+        - RABBITMQ_DELIVERY_MODE=NON_PERSISTENT
         - SERVER_PORT:9002
       depends_on:
         - mysqldb
         - mongodb
+        - rabbitmq
         - configserver
         - eurekaserver
+        - userservice
         - authservice
+        - productservice
+        - inventoryservice
+        - cartservice
+        - orderservice
       networks:
         seeker-network:
       restart: on-failure
@@ -222,6 +300,7 @@ services:
 volumes:
   mysql_db_data:
   mongo_db_data:
+  rabbitmq_data:
 
 networks:
   seeker-network:
