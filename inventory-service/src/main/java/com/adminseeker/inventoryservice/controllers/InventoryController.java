@@ -39,7 +39,6 @@ public class InventoryController {
     @PostMapping("")
     public ResponseEntity<?> save(@RequestHeader Map<String,String> headers,@RequestBody Inventory inventory){
         try {
-            headers.remove("content-length");
             Inventory newInventory = inventoryService.addInventory(inventory,headers);
             return new ResponseEntity<Inventory>(newInventory,HttpStatus.CREATED);
             
@@ -51,14 +50,12 @@ public class InventoryController {
 
     @GetMapping("/inapi")
     public ResponseEntity<?> getAll(@RequestHeader Map<String,String> headers){
-        headers.remove("content-length");
         return new ResponseEntity<List<Inventory>>(inventoryService.getInventory(headers),HttpStatus.OK);
     }
 
     @GetMapping("/public/{id}")
     public ResponseEntity<?> getInventoryById(@RequestHeader Map<String,String> headers,@PathVariable Long id){
         try {
-            headers.remove("content-length");
             InventoryResponse inventoryResponse = inventoryService.getInventoryById(id,headers);
             return new ResponseEntity<InventoryResponse>(inventoryResponse,HttpStatus.OK);
         } catch (Exception e) {
@@ -70,7 +67,6 @@ public class InventoryController {
     @GetMapping("/public/skucode/{skucode}")
     public ResponseEntity<?> getInventoryBySkuCode(@RequestHeader Map<String,String> headers,@PathVariable String skucode){
         try {
-            headers.remove("content-length");
             InventoryResponse inventoryResponse = inventoryService.getInventoryBySkucode(skucode,headers); 
             return new ResponseEntity<InventoryResponse>(inventoryResponse,HttpStatus.OK);
         } catch (Exception e) {
@@ -82,7 +78,6 @@ public class InventoryController {
     @GetMapping("/public/skucode/{skucode}/quantity")
     public ResponseEntity<?> getProductQuantityBySkuCode(@RequestHeader Map<String,String> headers,@PathVariable String skucode){
         try {
-            headers.remove("content-length");
             QuantityResponse quantityResponse = inventoryService.getProductQuantityBySkucode(skucode,headers); 
             return new ResponseEntity<QuantityResponse>(quantityResponse,HttpStatus.OK);
         } catch (Exception e) {
@@ -94,7 +89,6 @@ public class InventoryController {
     @PostMapping("/public/skucode/getquantity")
     public ResponseEntity<?> getProductQuantityBySkuCodes(@RequestHeader Map<String,String> headers,@RequestBody ProductQuantityRequest productQuantityRequest){
         try {
-            headers.remove("content-length");
             List<ProductQuantity> updates = inventoryService.getInventoryQuantityBySkuCodes(productQuantityRequest,headers); 
             return new ResponseEntity<List<ProductQuantity>>(updates,HttpStatus.OK);
         } catch (Exception e) {
@@ -107,7 +101,6 @@ public class InventoryController {
     @PatchMapping("/{id}")
     public ResponseEntity<?> updateById(@RequestHeader Map<String,String> headers,@RequestBody Inventory inventory, @PathVariable Long id){
         try{
-            headers.remove("content-length");
             Inventory inventoryDb = inventoryService.updateInventoryById(inventory, id,headers);
             return new ResponseEntity<Inventory>(inventoryDb,HttpStatus.OK);
         }
@@ -121,7 +114,6 @@ public class InventoryController {
     @PutMapping("/inapi/skucode/quantity")
     public ResponseEntity<?> updateProductQuantityBySkuCodes(@RequestHeader Map<String,String> headers,@RequestBody ProductQuantityRequest productQuantityRequest){
         try {
-            headers.remove("content-length");
             List<ProductQuantity> updates = inventoryService.updateInventoryQuantityBySkuCodes(productQuantityRequest,headers);
             return new ResponseEntity<List<ProductQuantity>>(updates,HttpStatus.OK);
         } catch (Exception e) {
@@ -133,7 +125,6 @@ public class InventoryController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> DeleteById(@RequestHeader Map<String,String> headers,@PathVariable Long id){
         try {
-            headers.remove("content-length");
             Inventory inventory = inventoryService.DeleteInventoryById(id,headers); 
             return new ResponseEntity<Inventory>(inventory,HttpStatus.OK);
         } catch (Exception e) {

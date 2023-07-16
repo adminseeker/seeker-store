@@ -3,6 +3,7 @@ package com.adminseeker.authservice.logging;
 import javax.servlet.http.HttpServletRequest;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -19,6 +20,9 @@ import org.springframework.stereotype.Component;
 import com.adminseeker.authservice.dto.AuthRequest;
 import com.adminseeker.authservice.proxies.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import net.minidev.json.JSONObject;
+
 
 @Aspect
 @Component
@@ -41,14 +45,17 @@ public class LoggerComponent {
     public Object logForRequestWithBody(ProceedingJoinPoint pjp, Object headers,Object body) throws Exception,Throwable{
         ObjectMapper mapper = new ObjectMapper();
 
-        log.info("Request Headers : {}" ,mapper.writeValueAsString(headers));
-        log.info("Request: method={}, uri={}",request.getMethod(),request.getRequestURI());
-        
         String reqBodyString = mapper.writeValueAsString(body);
         final long startTime = System.currentTimeMillis();
 
-        Object object = pjp.proceed();
-
+        Map<String,String> headersMap = (Map<String,String>)headers;
+        headersMap.remove("content-length");
+        headersMap.remove("x-b3-spanid");
+        headersMap.remove("x-b3-parentspanid");
+        Object[] args = pjp.getArgs();
+        args[0] = headersMap;
+        Object object = pjp.proceed(args);
+        
         String respBodyString = mapper.writeValueAsString(object);
 
         if(request.getRequestURI().equals("/api/v1/auth/register")){
@@ -63,10 +70,18 @@ public class LoggerComponent {
             reqBodyString = mapper.writeValueAsString(authRequest);
         }
 
-        log.info("Request Body : {}",reqBodyString);
-    
-
-        log.info("Response({} ms) : {}",System.currentTimeMillis()-startTime,respBodyString);
+        String requestLog = "Request = ";
+        requestLog=requestLog.concat("Headers: ").concat(JSONObject.escape(mapper.writeValueAsString(headers)));
+        requestLog=requestLog.concat(",Method: ").concat(request.getMethod());
+        requestLog=requestLog.concat(",URI: ").concat(request.getRequestURI());
+        if(!request.getMethod().equals("GET") && !request.getMethod().equals("DELETE")){
+            requestLog = requestLog.concat(",Body: ").concat(JSONObject.escape(reqBodyString));
+        }
+        String responseLog=",Response = ";
+        Long time = System.currentTimeMillis()-startTime;
+        responseLog=responseLog.concat("Time: ").concat(Long.toString(time)).concat("ms");
+        responseLog=responseLog.concat(",").concat(JSONObject.escape(respBodyString));
+        log.info(requestLog+responseLog);
         
         return object;
 

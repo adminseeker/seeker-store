@@ -35,7 +35,6 @@ public class CorrelationFilter implements GlobalFilter  {
 		} else {
 			String correlationID = generateCorrelationId();
 			exchange = filterUtility.setCorrelationId(exchange, correlationID);
-			logger.info("correlation-id generated: {}.", correlationID);
 		}
 		return chain.filter(exchange);
 	}

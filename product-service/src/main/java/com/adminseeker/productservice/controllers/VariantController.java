@@ -34,7 +34,6 @@ public class VariantController {
     @PostMapping("/{productId}/variant")
     public ResponseEntity<?> save(@RequestHeader Map<String,String> headers,@RequestBody Variant variantrequest, @PathVariable Long productId){
         try {
-            headers.remove("content-length");
             Variant variant = variantService.addVariant(productId, variantrequest, headers);
             return new ResponseEntity<Variant>(variant,HttpStatus.CREATED);
             
@@ -47,7 +46,6 @@ public class VariantController {
     @GetMapping("/public/{productId}/variant")
     public ResponseEntity<?> getAll(@RequestHeader Map<String,String> headers,@PathVariable Long productId){
         try {
-            headers.remove("content-length");
             return new ResponseEntity<List<Variant>>(variantService.getVariants(productId, headers),HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
@@ -58,7 +56,6 @@ public class VariantController {
     @GetMapping("/public/{productId}/variant/{variantId}")
     public ResponseEntity<?> getById(@RequestHeader Map<String,String> headers,@PathVariable Long productId, @PathVariable Long variantId){
         try {
-            headers.remove("content-length");
             Variant variant = variantService.getVariantById(productId, variantId, headers); 
             return new ResponseEntity<Variant>(variant,HttpStatus.OK);
         } catch (Exception e) {
@@ -70,7 +67,6 @@ public class VariantController {
     @PutMapping("/{productId}/variant/{variantId}")
     public ResponseEntity<?> updateById(@RequestHeader Map<String,String> headers,@RequestBody Variant variantrequest, @PathVariable Long productId, @PathVariable Long variantId){
         try{
-            headers.remove("content-length");
             Variant variantResult = variantService.UpdateVariantById(productId, variantrequest, variantId, headers);
             return new ResponseEntity<Variant>(variantResult,HttpStatus.OK);
         }
@@ -84,7 +80,6 @@ public class VariantController {
     @DeleteMapping("/{productId}/variant/{variantId}")
     public ResponseEntity<?> DeleteById(@RequestHeader Map<String,String> headers,@PathVariable Long productId, @PathVariable Long variantId){
         try {
-            headers.remove("content-length");
             Variant variant = variantService.deleteVariantById(productId, variantId, headers);
             return new ResponseEntity<Variant>(variant,HttpStatus.OK);
         } catch (Exception e) {
