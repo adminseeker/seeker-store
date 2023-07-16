@@ -46,6 +46,8 @@ public class CustomUserDetailsService implements UserDetailsService {
             headers.put(key, value);
         }
         headers.remove("content-length");
+        headers.remove("x-b3-spanid");
+        headers.remove("x-b3-parentspanid");
         Optional<User> user = userServiceRequest.getUserByEmail(emailRequest,headers);
         return user.map(CustomUserDetails::new).orElseThrow(() -> new UsernameNotFoundException("user not found with name :" + username));
     }

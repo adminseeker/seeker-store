@@ -35,7 +35,6 @@ public class CartController {
     @PostMapping("")
     public ResponseEntity<?> save(@RequestHeader Map<String,String> headers, @RequestBody CartRequest cartrequest){
         try {
-            headers.remove("content-length");
             return new ResponseEntity<Cart>(cartService.addItems(headers,cartrequest),HttpStatus.CREATED);
             
         } catch (Exception e) {
@@ -47,7 +46,6 @@ public class CartController {
     @GetMapping("")
     public ResponseEntity<?> getAll(@RequestHeader Map<String,String> headers){
         try {
-            headers.remove("content-length");
             return new ResponseEntity<CartResponse>(cartService.getCart(headers),HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
@@ -58,7 +56,6 @@ public class CartController {
     @PutMapping("/item/{itemId}")
     public ResponseEntity<?> updateById(@RequestHeader Map<String,String> headers,@RequestBody CartRequest cartrequest, @PathVariable String itemId){
         try{
-            headers.remove("content-length");
             Cart cartResult = cartService.updateItemById(headers,cartrequest,itemId);
             return new ResponseEntity<Cart>(cartResult,HttpStatus.OK);
         }
@@ -72,7 +69,6 @@ public class CartController {
     @DeleteMapping("/item/{itemId}")
     public ResponseEntity<?> DeleteItemById(@RequestHeader Map<String,String> headers,@PathVariable String itemId){
         try {
-            headers.remove("content-length");
             Cart cart = cartService.deleteItemById(headers,itemId);
             return new ResponseEntity<Cart>(cart,HttpStatus.OK);
         } catch (Exception e) {
@@ -84,7 +80,6 @@ public class CartController {
     @DeleteMapping("")
     public ResponseEntity<?> clearCart(@RequestHeader Map<String,String> headers){
         try {
-            headers.remove("content-length");
             Cart cart = cartService.clearCart(headers);
             return new ResponseEntity<Cart>(cart,HttpStatus.OK);
         } catch (Exception e) {

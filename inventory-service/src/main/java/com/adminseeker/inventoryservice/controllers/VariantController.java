@@ -38,7 +38,6 @@ public class VariantController {
     @PostMapping("/{inventoryId}/variant")
     public ResponseEntity<?> save(@RequestHeader Map<String,String> headers,@RequestBody VariantRequest variantrequest, @PathVariable Long inventoryId){
         try {
-            headers.remove("content-length");
             return new ResponseEntity<Variant>(variantService.addVariant(headers,inventoryId, variantrequest),HttpStatus.CREATED);
             
         } catch (Exception e) {
@@ -50,7 +49,6 @@ public class VariantController {
     @GetMapping("/public/{inventoryId}/variant")
     public ResponseEntity<?> getAll(@RequestHeader Map<String,String> headers,@PathVariable Long inventoryId){
         try {
-            headers.remove("content-length");
             return new ResponseEntity<List<Variant>>(variantService.getVariants(inventoryId),HttpStatus.OK);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
@@ -61,7 +59,6 @@ public class VariantController {
     @GetMapping("/public/{inventoryId}/variant/{variantId}")
     public ResponseEntity<?> getById(@RequestHeader Map<String,String> headers,@PathVariable Long inventoryId, @PathVariable Long variantId){
         try {
-            headers.remove("content-length");
             Variant variant = variantService.getVariantById(inventoryId, variantId); 
             return new ResponseEntity<Variant>(variant,HttpStatus.OK);
         } catch (Exception e) {
@@ -73,7 +70,6 @@ public class VariantController {
     @GetMapping("/public/skucode/{skucode}/variant/{variantSkucode}/quantity")
     public ResponseEntity<?> getProductVariantQuantityBySkuCode(@RequestHeader Map<String,String> headers,@PathVariable String skucode, @PathVariable String variantSkucode){
         try {
-            headers.remove("content-length");
             QuantityResponse quantityResponse = variantService.getProductVariantQuantityBySkucode(skucode,variantSkucode); 
             return new ResponseEntity<QuantityResponse>(quantityResponse,HttpStatus.OK);
         } catch (Exception e) {
@@ -85,7 +81,6 @@ public class VariantController {
     @PostMapping("/public/variant/skucode/getquantity")
     public ResponseEntity<?> getProductVariantQuantityBySkuCodes(@RequestHeader Map<String,String> headers,@RequestBody VariantQuantityRequest quantityUpdateRequest){
         try {
-            headers.remove("content-length");
             List<VariantQuantity> updates = variantService.getVariantQuantityBySkucodes(quantityUpdateRequest);
             return new ResponseEntity<List<VariantQuantity>>(updates,HttpStatus.OK);
         } catch (Exception e) {
@@ -97,7 +92,6 @@ public class VariantController {
     @PutMapping("/{inventoryId}/variant/{variantId}")
     public ResponseEntity<?> updateById(@RequestHeader Map<String,String> headers,@RequestBody VariantRequest variantrequest, @PathVariable Long inventoryId, @PathVariable Long variantId){
         try{
-            headers.remove("content-length");
             Variant variantResult = variantService.UpdateVariantById(headers,inventoryId, variantrequest, variantId);
             return new ResponseEntity<Variant>(variantResult,HttpStatus.OK);
         }
@@ -111,7 +105,6 @@ public class VariantController {
     @PutMapping("/inapi/variant/skucode/quantity")
     public ResponseEntity<?> updateProductVariantQuantityBySkuCodes(@RequestHeader Map<String,String> headers,@RequestBody VariantQuantityRequest quantityUpdateRequest){
         try {
-            headers.remove("content-length");
             List<VariantQuantity> updates = variantService.UpdateVariantQuantityBySkucodes(quantityUpdateRequest);
             return new ResponseEntity<List<VariantQuantity>>(updates,HttpStatus.OK);
         } catch (Exception e) {
@@ -123,7 +116,6 @@ public class VariantController {
     @DeleteMapping("/{inventoryId}/variant/{variantId}")
     public ResponseEntity<?> DeleteById(@RequestHeader Map<String,String> headers,@PathVariable Long inventoryId, @PathVariable Long variantId){
         try {
-            headers.remove("content-length");
             Variant variant = variantService.deleteVariantById(headers,inventoryId, variantId);
             return new ResponseEntity<Variant>(variant,HttpStatus.OK);
         } catch (Exception e) {

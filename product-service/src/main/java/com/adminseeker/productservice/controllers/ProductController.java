@@ -35,7 +35,6 @@ public class ProductController {
     @PostMapping("")
     public ResponseEntity<?> save(@RequestHeader Map<String,String> headers,@RequestBody Product product ){
         try {
-            headers.remove("content-length");
             Product newProduct = productService.addProduct(product,headers);
             return new ResponseEntity<Product>(newProduct,HttpStatus.CREATED);
             
@@ -47,7 +46,6 @@ public class ProductController {
 
     @GetMapping("/public")
     public ResponseEntity<?> getAllProducts(@RequestHeader Map<String,String> headers){
-        headers.remove("content-length");
         List<Product> products = productService.getAllProducts(headers);
         return new ResponseEntity<List<Product>>(products,HttpStatus.OK);
     }
@@ -55,7 +53,6 @@ public class ProductController {
     @GetMapping("/public/{id}")
     public ResponseEntity<?> getProductById(@RequestHeader Map<String,String> headers,@PathVariable Long id){
         try {
-            headers.remove("content-length");
             ProductResponse productResponse = productService.getProductById(id,headers); 
             return new ResponseEntity<ProductResponse>(productResponse,HttpStatus.OK);
         } catch (Exception e) {
@@ -67,7 +64,6 @@ public class ProductController {
     @GetMapping("/public/seller/{sellerId}")
     public ResponseEntity<?> getProductBySeller(@RequestHeader Map<String,String> headers,@PathVariable Long sellerId){
         try {
-            headers.remove("content-length");
             List<Product> products = productService.getProductsBySeller(sellerId,headers);
             return new ResponseEntity<List<Product>>(products,HttpStatus.OK);
         } catch (Exception e) {
@@ -80,7 +76,6 @@ public class ProductController {
     @GetMapping("/public/skucode/{skucode}")
     public ResponseEntity<?> getProductBySkuCode(@RequestHeader Map<String,String> headers,@PathVariable String skucode){
         try {
-            headers.remove("content-length");
             ProductResponse productResponse = productService.getProductBySkucode(skucode,headers);
             return new ResponseEntity<ProductResponse>(productResponse,HttpStatus.OK);
         } catch (Exception e) {
@@ -92,7 +87,6 @@ public class ProductController {
     @PatchMapping("/{id}")
     public ResponseEntity<?> updateById(@RequestHeader Map<String,String> headers,@RequestBody Product product, @PathVariable Long id){
         try{
-            headers.remove("content-length");
             Product productDb = productService.updateProductById(product, id,headers);
             return new ResponseEntity<Product>(productDb,HttpStatus.OK);
         }
@@ -106,7 +100,6 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> DeleteById(@RequestHeader Map<String,String> headers,@PathVariable Long id){
         try {
-            headers.remove("content-length");
             Product product = productService.DeleteProductById(id,headers);
             return new ResponseEntity<Product>(product,HttpStatus.OK);
         } catch (Exception e) {

@@ -32,7 +32,6 @@ public class OrderController {
     @PostMapping("")
     public ResponseEntity<?> placeOrder(@RequestHeader Map<String,String> headers,@RequestBody Order order){
         try {
-            headers.remove("content-length");
             return new ResponseEntity<Order>(orderService.placeOrder(headers,order),HttpStatus.CREATED);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
@@ -43,7 +42,6 @@ public class OrderController {
     @PostMapping("/cancel")
     public ResponseEntity<?> cancelOrder(@RequestHeader Map<String,String> headers,@RequestBody OrderRequest orderRequest){
         try {
-            headers.remove("content-length");
             return new ResponseEntity<Order>(orderService.cancelOrder(headers,orderRequest),HttpStatus.CREATED);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
@@ -54,7 +52,6 @@ public class OrderController {
     @PostMapping("/partialcancel")
     public ResponseEntity<?> partialCancelOrder(@RequestHeader Map<String,String> headers,@RequestBody OrderRequest orderRequest){
         try {
-            headers.remove("content-length");
             return new ResponseEntity<Order>(orderService.cancelPartialOrder(headers,orderRequest),HttpStatus.CREATED);
         } catch (Exception e) {
             ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
@@ -65,7 +62,6 @@ public class OrderController {
     @GetMapping("")
     public ResponseEntity<?> getOrders(@RequestHeader Map<String,String> headers,@RequestParam(required = false,defaultValue = "") String type,@RequestParam(required = false,defaultValue = "") String value){
         try {
-            headers.remove("content-length");
             List<OrderResponse> orderResponse = orderService.getOrders(headers,type,value); 
             return new ResponseEntity<List<OrderResponse>>(orderResponse,HttpStatus.OK);
         } catch (Exception e) {

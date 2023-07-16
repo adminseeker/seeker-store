@@ -1,5 +1,18 @@
 version: '3.8'
+
 services:
+
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - 5672:5672
+      - 15672:15672
+    hostname: rabbitmq
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - seeker-network
+  
   Elasticsearch:
     image: elasticsearch:7.16.2
     container_name: elasticsearch
@@ -43,8 +56,10 @@ services:
       - Elasticsearch  
     networks:
       - seeker-network
+
 volumes:
-  elastic_data: 
+  elastic_data:
+  rabbitmq_data:
 
 networks:
   seeker-network:

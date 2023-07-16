@@ -3,6 +3,7 @@ package com.adminseeker.productservice.logging;
 import javax.servlet.http.HttpServletRequest;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import net.minidev.json.JSONObject;
 
 
 @Aspect
@@ -47,19 +50,33 @@ public class LoggerComponent {
 		mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
        
+        
+        Map<String,String> headersMap = (Map<String,String>)headers;
+        headersMap.remove("content-length");
+        headersMap.remove("x-b3-spanid");
+        headersMap.remove("x-b3-parentspanid");
+        Object[] args = pjp.getArgs();
+        args[0] = headersMap;
+
         String reqBodyString = mapper.writeValueAsString(body);
         final long startTime = System.currentTimeMillis();
 
-        Object object = pjp.proceed();
+        Object object = pjp.proceed(args);
 
         String respBodyString = mapper.writeValueAsString(object);
 
-        log.info("Request Headers : {}" ,mapper.writeValueAsString(headers));
-        log.info("Request: method={}, uri={}",request.getMethod(),request.getRequestURI());
+        String requestLog = "Request = ";
+        requestLog=requestLog.concat("Headers: ").concat(JSONObject.escape(mapper.writeValueAsString(headers)));
+        requestLog=requestLog.concat(",Method: ").concat(request.getMethod());
+        requestLog=requestLog.concat(",URI: ").concat(request.getRequestURI());
         if(!request.getMethod().equals("GET") && !request.getMethod().equals("DELETE")){
-            log.info("Request Body : {}",reqBodyString);
+            requestLog = requestLog.concat(",Body: ").concat(JSONObject.escape(reqBodyString));
         }
-        log.info("Response({} ms) : {}",System.currentTimeMillis()-startTime,respBodyString);
+        String responseLog=",Response = ";
+        Long time = System.currentTimeMillis()-startTime;
+        responseLog=responseLog.concat("Time: ").concat(Long.toString(time));
+        responseLog=responseLog.concat(",").concat(JSONObject.escape(respBodyString));
+        log.info(requestLog+responseLog);
         return object;
     }
 
@@ -70,14 +87,28 @@ public class LoggerComponent {
 		mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-        Object object = pjp.proceed();
+        Map<String,String> headersMap = (Map<String,String>)headers;
+        headersMap.remove("content-length");
+        headersMap.remove("x-b3-spanid");
+        headersMap.remove("x-b3-parentspanid");
+        Object[] args = pjp.getArgs();
+        args[0] = headersMap;
+
+        Object object = pjp.proceed(args);
         final long startTime = System.currentTimeMillis();
 
         String respBodyString = mapper.writeValueAsString(object);
 
-        log.info("Request Headers : {}" ,mapper.writeValueAsString(headers));
-        log.info("Request: method={}, uri={}",request.getMethod(),request.getRequestURI());
-        log.info("Response({} ms) : {}",System.currentTimeMillis()-startTime,respBodyString);
+        String requestLog = "Request = ";
+        requestLog=requestLog.concat("Headers: ").concat(JSONObject.escape(mapper.writeValueAsString(headers)));
+        requestLog=requestLog.concat(",Method: ").concat(request.getMethod());
+        requestLog=requestLog.concat(",URI: ").concat(request.getRequestURI());
+
+        String responseLog=",Response = ";
+        Long time = System.currentTimeMillis()-startTime;
+        responseLog=responseLog.concat("Time: ").concat(Long.toString(time)).concat("ms");
+        responseLog=responseLog.concat(",").concat(JSONObject.escape(respBodyString));
+        log.info(requestLog+responseLog);
         return object;
     }
 

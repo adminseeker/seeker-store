@@ -13,17 +13,22 @@ import reactor.core.publisher.Flux;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
+import org.springframework.web.server.ServerWebExchange;
 
 import com.adminseeker.gatewayserver.dto.LogFilteredKeys;
 import com.google.gson.Gson;
+
+import net.minidev.json.JSONObject;
 
 
 public class RequestLoggingInterceptor extends ServerHttpRequestDecorator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestLoggingInterceptor.class);
 
-    public RequestLoggingInterceptor(ServerHttpRequest delegate) {
+    private String requestLog;
+    public RequestLoggingInterceptor(ServerHttpRequest delegate,String requestLog) {
         super(delegate);
+        this.requestLog=requestLog;
     }
 
     @Override
@@ -33,15 +38,14 @@ public class RequestLoggingInterceptor extends ServerHttpRequestDecorator {
             try {
                 Channels.newChannel(baos).write(dataBuffer.asByteBuffer().asReadOnlyBuffer());
                 String body = IOUtils.toString(baos.toByteArray(), "UTF-8");
-                LOGGER.info("Request Headers: {}",getDelegate().getHeaders().toString());
-                
-
+                String requestBody = "";
                 LogFilteredKeys logFilteredKeys =new Gson().fromJson(body, LogFilteredKeys.class);
                 if(StringUtils.isNotBlank(logFilteredKeys.getPassword())){
-                    LOGGER.info("Request body: NOT LOGGED DUE TO SENSITIVE INFORMATION");
+                    requestBody =  requestBody.concat(",Body: ").concat("NOT LOGGED DUE TO SENSITIVE INFORMATION");
                 }else{
-                    LOGGER.info("Request body: {}",body);
+                    requestBody =  requestBody.concat(",Body: ").concat(JSONObject.escape(body));
                 }
+                LOGGER.info(requestLog+requestBody);
             } catch (IOException e) {
                 LOGGER.error("ERROR: ", e.getMessage());
             } finally {
