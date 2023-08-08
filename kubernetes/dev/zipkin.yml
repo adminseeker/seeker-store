@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zipkin-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zipkin
+  template:
+    metadata:
+      labels:
+        app: zipkin
+    spec:
+      containers:
+      - name: zipkin
+        image: openzipkin/zipkin
+        resources:
+          limits:
+            memory: "2048Mi"
+            cpu: "2000m"
+        ports:
+        - containerPort: 9411
+        env:
+        - name: STORAGE_TYPE
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: ZIPKIN_STORAGE_TYPE
+        - name: MYSQL_HOST
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: ZIPKIN_MYSQL_HOST
+        - name: MYSQL_USER
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: ZIPKIN_MYSQL_USER
+        - name: MYSQL_PASS
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: ZIPKIN_MYSQL_PASS
+
+      # - name: dependencies
+      #   image: openzipkin/zipkin-dependencies
+      #   command: ["/bin/sh"]
+      #   args: ["-c", "crond -f"]
+      #   resources:
+      #     limits:
+      #       memory: "2048Mi"
+      #       cpu: "2000m"
+      #   env:
+      #   - name: STORAGE_TYPE
+      #     valueFrom: 
+      #       configMapKeyRef:
+      #         name: seeker-store-configmap
+      #         key: ZIPKIN_STORAGE_TYPE
+      #   - name: MYSQL_HOST
+      #     valueFrom: 
+      #       configMapKeyRef:
+      #         name: seeker-store-configmap
+      #         key: ZIPKIN_MYSQL_HOST
+      #   - name: MYSQL_USER
+      #     valueFrom: 
+      #       configMapKeyRef:
+      #         name: seeker-store-configmap
+      #         key: ZIPKIN_MYSQL_USER
+      #   - name: MYSQL_PASS
+      #     valueFrom: 
+      #       configMapKeyRef:
+      #         name: seeker-store-configmap
+      #         key: ZIPKIN_MYSQL_PASS
+      
+        
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: zipkin-service
+spec:
+  selector:
+    app: zipkin
+  type: LoadBalancer
+  ports:
+  - port: 9411
+    targetPort: 9411
