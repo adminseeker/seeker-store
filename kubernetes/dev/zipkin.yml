@@ -42,37 +42,11 @@ spec:
             configMapKeyRef:
               name: seeker-store-configmap
               key: ZIPKIN_MYSQL_PASS
-
-      # - name: dependencies
-      #   image: openzipkin/zipkin-dependencies
-      #   command: ["/bin/sh"]
-      #   args: ["-c", "crond -f"]
-      #   resources:
-      #     limits:
-      #       memory: "2048Mi"
-      #       cpu: "2000m"
-      #   env:
-      #   - name: STORAGE_TYPE
-      #     valueFrom: 
-      #       configMapKeyRef:
-      #         name: seeker-store-configmap
-      #         key: ZIPKIN_STORAGE_TYPE
-      #   - name: MYSQL_HOST
-      #     valueFrom: 
-      #       configMapKeyRef:
-      #         name: seeker-store-configmap
-      #         key: ZIPKIN_MYSQL_HOST
-      #   - name: MYSQL_USER
-      #     valueFrom: 
-      #       configMapKeyRef:
-      #         name: seeker-store-configmap
-      #         key: ZIPKIN_MYSQL_USER
-      #   - name: MYSQL_PASS
-      #     valueFrom: 
-      #       configMapKeyRef:
-      #         name: seeker-store-configmap
-      #         key: ZIPKIN_MYSQL_PASS
-      
+        - name: RABBIT_ADDRESSES
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: ZIPKIN_RABBIT_ADDRESSES
         
 ---
 
