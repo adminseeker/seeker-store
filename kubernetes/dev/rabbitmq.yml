@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+      - name: rabbitmq
+        image: rabbitmq:management
+        resources:
+          limits:
+            memory: "2048Mi"
+            cpu: "2000m"
+        ports:
+        - containerPort: 5672
+          name: default
+        - containerPort: 15672
+          name: management
+        volumeMounts:
+        - name: rabbitmq-volume
+          mountPath: /var/lib/rabbitmq
+      volumes:
+      - name: rabbitmq-volume
+        persistentVolumeClaim:
+          claimName: nfs-pvc
+        
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-service
+spec:
+  selector:
+    app: rabbitmq
+  type: LoadBalancer
+  ports:
+  - port: 5672
+    targetPort: 5672
+    name: default
+  - port: 15672
+    targetPort: 15672
+    name: management

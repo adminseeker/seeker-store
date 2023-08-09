@@ -1,0 +1,20 @@
+apiVersion: v1
+
+kind: ConfigMap
+
+metadata:
+
+  name: kube-dns
+
+  namespace: kube-system
+
+data:
+
+  stubDomains: |
+
+    {"aravindweb.com": ["192.168.3.250"]}
+
+  upstreamNameservers: |
+
+    ["8.8.8.8", "8.8.4.4"]
+
