@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eurekaserver-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eurekaserver
+  template:
+    metadata:
+      labels:
+        app: eurekaserver
+    spec:
+      containers:
+      - name: eurekaserver
+        image: ghcr.io/adminseeker/eureka-server
+        
+        resources:
+          limits:
+            memory: "2048Mi"
+            cpu: "200m"
+        ports:
+        - containerPort: 9001
+        env:
+        - name: CONFIG_SERVER
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: CONFIG_SERVER
+        - name: EUREKA_URL
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: EUREKA_URL
+      imagePullSecrets:
+      - name: dockerconfigjson-github-com
+        
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: eurekaserver-service
+spec:
+  selector:
+    app: eurekaserver
+  type: LoadBalancer
+  ports:
+  - port: 9001
+    targetPort: 9001

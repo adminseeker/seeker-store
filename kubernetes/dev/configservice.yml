@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: configservice-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: configservice
+  template:
+    metadata:
+      labels:
+        app: configservice
+    spec:
+      containers:
+      - name: configservice
+        image: ghcr.io/adminseeker/config-service
+        
+        resources:
+          limits:
+            memory: "2048Mi"
+            cpu: "200m"
+        ports:
+        - containerPort: 9000
+        env:
+        - name: CONFIG_MYSQL_HOST
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: CONFIG_MYSQL_HOST
+        - name: CONFIG_MYSQL_PORT
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: CONFIG_MYSQL_PORT
+        - name: CONFIG_MYSQL_USER
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: CONFIG_MYSQL_USER
+        - name: CONFIG_MYSQL_PASSWORD
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: CONFIG_MYSQL_PASSWORD
+        - name: CONFIG_MYSQL_DB
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: CONFIG_MYSQL_DB
+        - name: CONFIG_SERVER_USER
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: CONFIG_SERVER_USER
+        - name: CONFIG_SERVER_PASSWORD
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: CONFIG_SERVER_PASSWORD
+        - name: EUREKA_URL
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: EUREKA_URL
+      imagePullSecrets:
+      - name: dockerconfigjson-github-com
+        
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: configservice-service
+spec:
+  selector:
+    app: configservice
+  type: LoadBalancer
+  ports:
+  - port: 9000
+    targetPort: 9000

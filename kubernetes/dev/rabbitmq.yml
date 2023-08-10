@@ -18,7 +18,7 @@ spec:
         resources:
           limits:
             memory: "2048Mi"
-            cpu: "2000m"
+            cpu: "200m"
         ports:
         - containerPort: 5672
           name: default
@@ -27,6 +27,7 @@ spec:
         volumeMounts:
         - name: rabbitmq-volume
           mountPath: /var/lib/rabbitmq
+          subPath: rabbitmq
       volumes:
       - name: rabbitmq-volume
         persistentVolumeClaim:

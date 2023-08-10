@@ -1,3 +1,4 @@
 .vscode
 dev-cache/
 kubernetes/dev/configmap.yml
+kubernetes/dev/ghcr-secret.yml
