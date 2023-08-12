@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gatewayserver-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gatewayserver
+  template:
+    metadata:
+      labels:
+        app: gatewayserver
+    spec:
+      containers:
+      - name: gatewayserver
+        image: ghcr.io/adminseeker/gateway-server
+        
+        resources:
+          requests:
+            memory: "1024Mi"
+            cpu: "200m"
+          limits:
+            memory: "2048Mi"
+            cpu: "900m"
+        ports:
+        - containerPort: 9002
+        env:
+        - name: CONFIG_PROFILE
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: CONFIG_PROFILE
+        - name: CONFIG_LABEL
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: CONFIG_LABEL
+        - name: RABBITMQ_HOSTNAME
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: RABBITMQ_HOSTNAME
+        - name: RABBITMQ_PORT
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: RABBITMQ_PORT
+        - name: RABBITMQ_USERNAME
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: RABBITMQ_USERNAME
+        - name: RABBITMQ_PASSWORD
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: RABBITMQ_PASSWORD
+        - name: RABBITMQ_EXCHANGE
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: RABBITMQ_EXCHANGE
+        - name: RABBITMQ_ROUTING_PATTERN
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: RABBITMQ_ROUTING_PATTERN
+        - name: RABBITMQ_DELIVERY_MODE
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: RABBITMQ_DELIVERY_MODE
+        - name: ZIPKIN_URL
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: ZIPKIN_URL
+        - name: RABBITMQ_ZIPKIN_QUEUE
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: RABBITMQ_ZIPKIN_QUEUE
+        - name: EUREKA_URL
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: EUREKA_URL
+        - name: CONFIG_SERVER
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: CONFIG_SERVER
+        - name: VERSION
+          valueFrom: 
+            configMapKeyRef:
+              name: seeker-store-configmap
+              key: GATEWAYSERVER_VERSION
+      imagePullSecrets:
+      - name: dockerconfigjson-github-com
+        
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: gatewayserver-service
+spec:
+  selector:
+    app: gatewayserver
+  type: LoadBalancer
+  ports:
+  - port: 9002
+    targetPort: 9002

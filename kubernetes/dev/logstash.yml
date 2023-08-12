@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logstash-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logstash
+  template:
+    metadata:
+      labels:
+        app: logstash
+    spec:
+      containers:
+      - name: logstash
+        image: logstash:7.16.2
+        command: ["/bin/sh"]
+        args: ["-c", "logstash -f /logstash/logstash.conf"]
+        resources:
+          requests:
+            memory: "1024Mi"
+            cpu: "200m"
+          limits:
+            memory: "2048Mi"
+            cpu: "900m"
+        ports:
+          - containerPort: 9600
+        volumeMounts:
+        - name: logstash-data-volume
+          mountPath: /logstash
+          subPath: logstash
+      volumes:
+      - name: logstash-data-volume
+        persistentVolumeClaim:
+          claimName: nfs-pvc
+        
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: logstash-service
+spec:
+  selector:
+    app: logstash
+  type: LoadBalancer
+  ports:
+  - port: 9600
+    targetPort: 9600

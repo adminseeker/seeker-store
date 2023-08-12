@@ -16,9 +16,12 @@ spec:
       - name: zipkin
         image: openzipkin/zipkin
         resources:
+          requests:
+            memory: "1024Mi"
+            cpu: "200m"
           limits:
             memory: "2048Mi"
-            cpu: "200m"
+            cpu: "900m"
         ports:
         - containerPort: 9411
         env:

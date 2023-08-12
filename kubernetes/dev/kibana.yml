@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      containers:
+      - name: kibana
+        image: kibana:7.16.2
+        
+        resources:
+          requests:
+            memory: "1024Mi"
+            cpu: "200m"
+          limits:
+            memory: "2048Mi"
+            cpu: "900m"
+        ports:
+          - containerPort: 5601
+        volumeMounts:
+        - name: kibana-data-volume
+          mountPath: /usr/share/kibana/config
+          subPath: kibana/config
+      volumes:
+      - name: kibana-data-volume
+        persistentVolumeClaim:
+          claimName: nfs-pvc
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana-service
+spec:
+  selector:
+    app: kibana
+  type: LoadBalancer
+  ports:
+  - port: 5601
+    targetPort: 5601

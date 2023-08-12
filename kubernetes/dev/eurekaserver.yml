@@ -17,9 +17,12 @@ spec:
         image: ghcr.io/adminseeker/eureka-server
         
         resources:
+          requests:
+            memory: "1024Mi"
+            cpu: "200m"
           limits:
             memory: "2048Mi"
-            cpu: "200m"
+            cpu: "900m"
         ports:
         - containerPort: 9001
         env:
@@ -35,6 +38,14 @@ spec:
               key: EUREKA_URL
       imagePullSecrets:
       - name: dockerconfigjson-github-com
+      dnsConfig:
+        nameservers:
+        - 192.168.3.250
+        searches:
+        - aravindweb.com
+        options:
+        - name: ndots
+          value: "3"
         
 ---
 
