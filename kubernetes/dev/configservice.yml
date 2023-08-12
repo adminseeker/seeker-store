@@ -17,9 +17,12 @@ spec:
         image: ghcr.io/adminseeker/config-service
         
         resources:
+          requests:
+            memory: "1024Mi"
+            cpu: "200m"
           limits:
             memory: "2048Mi"
-            cpu: "200m"
+            cpu: "900m"
         ports:
         - containerPort: 9000
         env:

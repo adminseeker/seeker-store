@@ -16,20 +16,29 @@ spec:
       - name: rabbitmq
         image: rabbitmq:management
         resources:
+          requests:
+            memory: "1024Mi"
+            cpu: "200m"
           limits:
             memory: "2048Mi"
-            cpu: "200m"
+            cpu: "900m"
         ports:
-        - containerPort: 5672
-          name: default
-        - containerPort: 15672
-          name: management
+          - containerPort: 5672
+            name: default
+          - containerPort: 15672
+            name: management
+        env:
+          - name: RABBITMQ_NODENAME
+            valueFrom: 
+              configMapKeyRef:
+                name: seeker-store-configmap
+                key: RABBITMQ_NODENAME
         volumeMounts:
-        - name: rabbitmq-volume
+        - name: rabbitmq-data-volume
           mountPath: /var/lib/rabbitmq
           subPath: rabbitmq
       volumes:
-      - name: rabbitmq-volume
+      - name: rabbitmq-data-volume
         persistentVolumeClaim:
           claimName: nfs-pvc
         
