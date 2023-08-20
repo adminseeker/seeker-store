@@ -1,30 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: userservice-deployment
+  name: authservice-deployment
+  namespace: seeker-store
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: userservice
+      app: authservice
   template:
     metadata:
       labels:
-        app: userservice
+        app: authservice
     spec:
       containers:
-      - name: userservice
-        image: ghcr.io/adminseeker/user-service
+      - name: authservice
+        image: ghcr.io/adminseeker/auth-service
         
         resources:
           requests:
             memory: "1024Mi"
             cpu: "200m"
           limits:
-            memory: "2048Mi"
+            memory: "4096Mi"
             cpu: "900m"
         ports:
-        - containerPort: 8081
+        - containerPort: 8090
         env:
         - name: CONFIG_PROFILE
           valueFrom: 
@@ -95,21 +96,21 @@ spec:
           valueFrom: 
             configMapKeyRef:
               name: seeker-store-configmap
-              key: USERSERVICE_VERSION
+              key: AUTHSERVICE_VERSION
       imagePullSecrets:
       - name: dockerconfigjson-github-com
-    
         
 ---
 
 apiVersion: v1
 kind: Service
 metadata:
-  name: userservice-service
+  name: authservice-service
+  namespace: seeker-store
 spec:
   selector:
-    app: userservice
-  type: LoadBalancer
+    app: authservice
+  
   ports:
-  - port: 8081
-    targetPort: 8081
+  - port: 8090
+    targetPort: 8090

@@ -1,30 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: orderservice-deployment
+  name: productservice-deployment
+  namespace: seeker-store
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: orderservice
+      app: productservice
   template:
     metadata:
       labels:
-        app: orderservice
+        app: productservice
     spec:
       containers:
-      - name: orderservice
-        image: ghcr.io/adminseeker/order-service
+      - name: productservice
+        image: ghcr.io/adminseeker/product-service
         
         resources:
           requests:
             memory: "1024Mi"
             cpu: "200m"
           limits:
-            memory: "2048Mi"
+            memory: "4096Mi"
             cpu: "900m"
         ports:
-        - containerPort: 8085
+        - containerPort: 8082
         env:
         - name: CONFIG_PROFILE
           valueFrom: 
@@ -95,7 +96,7 @@ spec:
           valueFrom: 
             configMapKeyRef:
               name: seeker-store-configmap
-              key: ORDERSERVICE_VERSION
+              key: PRODUCTSERVICE_VERSION
       imagePullSecrets:
       - name: dockerconfigjson-github-com
         
@@ -104,11 +105,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: orderservice-service
+  name: productservice-service
+  namespace: seeker-store
 spec:
   selector:
-    app: orderservice
-  type: LoadBalancer
+    app: productservice
+  
   ports:
-  - port: 8085
-    targetPort: 8085
+  - port: 8082
+    targetPort: 8082

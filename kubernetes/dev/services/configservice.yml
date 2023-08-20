@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: configservice-deployment
+  namespace: seeker-store
 spec:
   replicas: 1
   selector:
@@ -21,7 +22,7 @@ spec:
             memory: "1024Mi"
             cpu: "200m"
           limits:
-            memory: "2048Mi"
+            memory: "4096Mi"
             cpu: "900m"
         ports:
         - containerPort: 9000
@@ -75,10 +76,11 @@ apiVersion: v1
 kind: Service
 metadata:
   name: configservice-service
+  namespace: seeker-store
 spec:
   selector:
     app: configservice
-  type: LoadBalancer
+  
   ports:
   - port: 9000
     targetPort: 9000

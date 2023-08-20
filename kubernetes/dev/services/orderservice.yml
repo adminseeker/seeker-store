@@ -1,30 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cartservice-deployment
+  name: orderservice-deployment
+  namespace: seeker-store
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: cartservice
+      app: orderservice
   template:
     metadata:
       labels:
-        app: cartservice
+        app: orderservice
     spec:
       containers:
-      - name: cartservice
-        image: ghcr.io/adminseeker/cart-service
+      - name: orderservice
+        image: ghcr.io/adminseeker/order-service
         
         resources:
           requests:
             memory: "1024Mi"
             cpu: "200m"
           limits:
-            memory: "2048Mi"
+            memory: "4096Mi"
             cpu: "900m"
         ports:
-        - containerPort: 8084
+        - containerPort: 8085
         env:
         - name: CONFIG_PROFILE
           valueFrom: 
@@ -95,7 +96,7 @@ spec:
           valueFrom: 
             configMapKeyRef:
               name: seeker-store-configmap
-              key: CARTSERVICE_VERSION
+              key: ORDERSERVICE_VERSION
       imagePullSecrets:
       - name: dockerconfigjson-github-com
         
@@ -104,11 +105,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: cartservice-service
+  name: orderservice-service
+  namespace: seeker-store
 spec:
   selector:
-    app: cartservice
-  type: LoadBalancer
+    app: orderservice
+  
   ports:
-  - port: 8084
-    targetPort: 8084
+  - port: 8085
+    targetPort: 8085
