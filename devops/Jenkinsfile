@@ -6,20 +6,63 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Build And Convert to Docker Images') {
-            // options {
-            //     // Timeout counter starts BEFORE agent is allocated
-            //     // timeout(time: 1, unit: 'SECONDS')
-            // }
+        stage('Build Docker Images') {
             stages {
-               
-                stage("gateway-server build"){
-                    // when { changeset "gateway-server/**" }
+                stage("user-service build"){
+                    when { changeset "user-service/**" }
                     steps {
-                        sh 'hostname'
+                        sh 'cd user-service && mvn clean spring-boot:build-image -DskipTests'
+                    }
+                }
+                stage("auth-service build"){
+                    when { changeset "auth-service/**" }
+                    steps {
+                        sh 'cd auth-service && mvn clean spring-boot:build-image -DskipTests'
+                    }
+                }
+                stage("product-service build"){
+                    when { changeset "product-service/**" }
+                    steps {
+                        sh 'cd product-service && mvn clean spring-boot:build-image -DskipTests'
+                    }
+                }
+                stage("inventory-service build"){
+                    when { changeset "inventory-service/**" }
+                    steps {
+                        sh 'cd inventory-service && mvn clean spring-boot:build-image -DskipTests'
+                    }
+                }
+                stage("cart-service build"){
+                    when { changeset "cart-service/**" }
+                    steps {
+                        sh 'cd cart-service && mvn clean spring-boot:build-image -DskipTests'
+                    }
+                }
+                stage("order-service build"){
+                    when { changeset "order-service/**" }
+                    steps {
+                        sh 'cd order-service && mvn clean spring-boot:build-image -DskipTests'
+                    }
+                }
+                stage("gateway-server build"){
+                    when { changeset "gateway-server/**" }
+                    steps {
                         sh 'cd gateway-server && mvn clean spring-boot:build-image -DskipTests'
                     }
                 }
+                stage("config-service build"){
+                    when { changeset "config-service/**" }
+                    steps {
+                        sh 'cd config-service && mvn clean spring-boot:build-image -DskipTests'
+                    }
+                }
+                stage("eureka-server build"){
+                    when { changeset "eureka-server/**" }
+                    steps {
+                        sh 'cd eureka-server && mvn clean spring-boot:build-image -DskipTests'
+                    }
+                }   
+            
             }
         }
     }
