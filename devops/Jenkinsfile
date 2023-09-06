@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent docker-host
     stages {
         stage('Code Checkout') {
             steps{
