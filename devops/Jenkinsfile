@@ -20,6 +20,7 @@ pipeline {
                     when { changeset "user-service/**" }
                     steps {
                         sh 'cd user-service && mvn clean spring-boot:build-image -DskipTests'
+                        sh 'echo pushing package to github container registry...'
                         sh 'docker push ghcr.io/adminseeker/user-service'
                     }
                 }
@@ -27,6 +28,7 @@ pipeline {
                     when { changeset "auth-service/**" }
                     steps {
                         sh 'cd auth-service && mvn clean spring-boot:build-image -DskipTests'
+                        sh 'echo pushing package to github container registry...'
                         sh 'docker push ghcr.io/adminseeker/auth-service'
                     }
                 }
@@ -34,6 +36,7 @@ pipeline {
                     when { changeset "product-service/**" }
                     steps {
                         sh 'cd product-service && mvn clean spring-boot:build-image -DskipTests'
+                        sh 'echo pushing package to github container registry...'
                         sh 'docker push ghcr.io/adminseeker/product-service'
                     }
                 }
@@ -41,6 +44,7 @@ pipeline {
                     when { changeset "inventory-service/**" }
                     steps {
                         sh 'cd inventory-service && mvn clean spring-boot:build-image -DskipTests'
+                        sh 'echo pushing package to github container registry...'
                         sh 'docker push ghcr.io/adminseeker/inventory-service'
                     }
                 }
@@ -48,6 +52,7 @@ pipeline {
                     when { changeset "cart-service/**" }
                     steps {
                         sh 'cd cart-service && mvn clean spring-boot:build-image -DskipTests'
+                        sh 'echo pushing package to github container registry...'
                         sh 'docker push ghcr.io/adminseeker/cart-service'
                     }
                 }
@@ -55,6 +60,7 @@ pipeline {
                     when { changeset "order-service/**" }
                     steps {
                         sh 'cd order-service && mvn clean spring-boot:build-image -DskipTests'
+                        sh 'echo pushing package to github container registry...'
                         sh 'docker push ghcr.io/adminseeker/order-service'
                     }
                 }
@@ -62,6 +68,7 @@ pipeline {
                     when { changeset "gateway-server/**" }
                     steps {
                         sh 'cd gateway-server && mvn clean spring-boot:build-image -DskipTests'
+                        sh 'echo pushing package to github container registry...'
                         sh 'docker push ghcr.io/adminseeker/gateway-server'
                     }
                 }
@@ -69,6 +76,7 @@ pipeline {
                     when { changeset "config-service/**" }
                     steps {
                         sh 'cd config-service && mvn clean spring-boot:build-image -DskipTests'
+                        sh 'echo pushing package to github container registry...'
                         sh 'docker push ghcr.io/adminseeker/config-service'
                     }
                 }
@@ -76,6 +84,7 @@ pipeline {
                     when { changeset "eureka-server/**" }
                     steps {
                         sh 'cd eureka-server && mvn clean spring-boot:build-image -DskipTests'
+                        sh 'echo pushing package to github container registry...'
                         sh 'docker push ghcr.io/adminseeker/eureka-server'
                     }
                 }   
