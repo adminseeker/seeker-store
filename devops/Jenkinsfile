@@ -82,11 +82,5 @@ pipeline {
             
             }
         }
-
-        stage('Push Docker Images to Github Packages') {
-            steps{
-
-            }
-        }
     }
 }
