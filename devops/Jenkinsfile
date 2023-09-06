@@ -1,9 +1,17 @@
 pipeline {
     agent { label 'docker-host'}
+      environment {
+        DOCKERHUB_CREDENTIALS = credentials('github-secret-as-username-password')
+    }
     stages {
         stage('Code Checkout') {
             steps{
                 checkout scm
+            }
+        }
+        stage('Docker Login') {
+            steps {
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
             }
         }
         stage('Build Docker Images') {
@@ -12,57 +20,72 @@ pipeline {
                     when { changeset "user-service/**" }
                     steps {
                         sh 'cd user-service && mvn clean spring-boot:build-image -DskipTests'
+                        sh 'docker push ghcr.io/adminseeker/user-service'
                     }
                 }
                 stage("auth-service build"){
                     when { changeset "auth-service/**" }
                     steps {
                         sh 'cd auth-service && mvn clean spring-boot:build-image -DskipTests'
+                        sh 'docker push ghcr.io/adminseeker/auth-service'
                     }
                 }
                 stage("product-service build"){
                     when { changeset "product-service/**" }
                     steps {
                         sh 'cd product-service && mvn clean spring-boot:build-image -DskipTests'
+                        sh 'docker push ghcr.io/adminseeker/product-service'
                     }
                 }
                 stage("inventory-service build"){
                     when { changeset "inventory-service/**" }
                     steps {
                         sh 'cd inventory-service && mvn clean spring-boot:build-image -DskipTests'
+                        sh 'docker push ghcr.io/adminseeker/inventory-service'
                     }
                 }
                 stage("cart-service build"){
                     when { changeset "cart-service/**" }
                     steps {
                         sh 'cd cart-service && mvn clean spring-boot:build-image -DskipTests'
+                        sh 'docker push ghcr.io/adminseeker/cart-service'
                     }
                 }
                 stage("order-service build"){
                     when { changeset "order-service/**" }
                     steps {
                         sh 'cd order-service && mvn clean spring-boot:build-image -DskipTests'
+                        sh 'docker push ghcr.io/adminseeker/order-service'
                     }
                 }
                 stage("gateway-server build"){
                     when { changeset "gateway-server/**" }
                     steps {
                         sh 'cd gateway-server && mvn clean spring-boot:build-image -DskipTests'
+                        sh 'docker push ghcr.io/adminseeker/gateway-server'
                     }
                 }
                 stage("config-service build"){
                     when { changeset "config-service/**" }
                     steps {
                         sh 'cd config-service && mvn clean spring-boot:build-image -DskipTests'
+                        sh 'docker push ghcr.io/adminseeker/config-service'
                     }
                 }
                 stage("eureka-server build"){
                     when { changeset "eureka-server/**" }
                     steps {
                         sh 'cd eureka-server && mvn clean spring-boot:build-image -DskipTests'
+                        sh 'docker push ghcr.io/adminseeker/eureka-server'
                     }
                 }   
             
+            }
+        }
+
+        stage('Push Docker Images to Github Packages') {
+            steps{
+
             }
         }
     }
