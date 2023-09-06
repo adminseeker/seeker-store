@@ -16,6 +16,7 @@ pipeline {
                 stage("gateway-server build"){
                     // when { changeset "gateway-server/**" }
                     steps {
+                        sh 'hostname'
                         sh 'cd gateway-server && mvn clean spring-boot:build-image -DskipTests'
                     }
                 }
