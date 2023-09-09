@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: eurekaserver
-        image: ghcr.io/adminseeker/eureka-server
+        image: ghcr.io/adminseeker/eureka-server:59
         
         resources:
           requests:

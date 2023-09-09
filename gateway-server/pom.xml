@@ -114,7 +114,7 @@
 							<enabled>true</enabled>
 						</layers>
 						<image>
-							<name>ghcr.io/adminseeker/${project.artifactId}</name>
+							<name>ghcr.io/adminseeker/${project.artifactId}:${imageVersion}</name>
 						</image>
 						<excludes>
 							<exclude>
