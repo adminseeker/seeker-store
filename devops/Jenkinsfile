@@ -26,6 +26,7 @@ pipeline {
                         // sh 'updating kubernetes manifest file...'
                         withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                             sh '''
+                                pwd
                                 git config user.email "aravind.arali@gmail.com"
                                 git config user.name "adminseeker"
                                 BUILD_NUMBER=${BUILD_NUMBER}
