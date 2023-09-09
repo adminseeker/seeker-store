@@ -19,20 +19,22 @@ pipeline {
                 stage("user-service build"){
                     // when { changeset "user-service/**" }
                     steps {
-                        sh "cd user-service && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
-                        sh 'echo pushing package to github container registry...'
-                        sh "docker push ghcr.io/adminseeker/user-service:${BUILD_NUMBER}"
-                        sh 'cd ..'
-                        sh 'updating kubernetes manifest file...'
+                        // sh "cd user-service && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
+                        // sh 'echo pushing package to github container registry...'
+                        // sh "docker push ghcr.io/adminseeker/user-service:${BUILD_NUMBER}"
+                        // sh 'cd ..'
+                        // sh 'updating kubernetes manifest file...'
                         withCredentials([string(credentialsId: 'github-secret-as-username-password', variable: 'GITHUB_TOKEN')]) {
                             sh '''
                                 git config user.email "aravind.arali@gmail.com"
                                 git config user.name "adminseeker"
                                 BUILD_NUMBER=${BUILD_NUMBER}
+                                GIT_USER_NAME=adminseeker
+                                GIT_REPO_NAME=seeker-store
                                 sed -i "s+ghcr.io/adminseeker/user-service.*+ghcr.io/adminseeker/user-service:+g${BUILD_NUMBER}" kubernetes/dev/services/userservice.yml
                                 git add kubernetes/dev/services/userservice.yml
                                 git commit -m "Update user-service image to version ${BUILD_NUMBER}"
-                                git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} dev
+                                git push https://${GITHUB_TOKEN}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME dev
                             '''
                         }
                     }
