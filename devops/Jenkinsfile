@@ -23,10 +23,9 @@ pipeline {
                         sh 'echo pushing package to github container registry...'
                         sh "docker push ghcr.io/adminseeker/user-service:${BUILD_NUMBER}"
                         sh 'cd ..'
-                        
                     }
                 }
-                stage('Update Kubernetes Mankfest File'){
+                stage('Update Kubernetes Manifest File'){
                     when { changeset "user-service/**" }
                     steps {
                         script{
@@ -39,214 +38,245 @@ pipeline {
                                     GIT_REPO_NAME=seeker-store
                                     sed -i "s+ghcr.io/adminseeker/user-service.*+ghcr.io/adminseeker/user-service:$BUILD_NUMBER+g" kubernetes/dev/services/userservice.yml
                                     git add kubernetes/dev/services/userservice.yml
-                                    git commit -m "Update user-service image to version ${BUILD_NUMBER}"
+                                    git commit -m "Updated user-service image to version ${BUILD_NUMBER}"
                                     git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
                                 '''
                             }
                         }
                     }
                 }
-                // stage("auth-service build"){
-                //     when { changeset "auth-service/**" }
-                //     steps {
-                //         sh "cd auth-service && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
-                //         sh 'echo pushing package to github container registry...'
-                //         sh "docker push ghcr.io/adminseeker/auth-service:${BUILD_NUMBER}"
-                //         sh 'cd ..'
-                //         sh 'updating kubernetes manifest file...'
-                //         script{
-                //             withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                //                 sh '''
-                //                     git config user.email "aravind.arali@gmail.com"
-                //                     git config user.name "adminseeker"
-                //                     BUILD_NUMBER=${BUILD_NUMBER}
-                //                     GIT_USER_NAME=adminseeker
-                //                     GIT_REPO_NAME=seeker-store
-                //                     sed -i "s+ghcr.io/adminseeker/auth-service.*+ghcr.io/adminseeker/auth-service:$BUILD_NUMBER+g" kubernetes/dev/services/authservice.yml
-                //                     git add kubernetes/dev/services/authservice.yml
-                //                     git commit -m "Update auth-service image to version ${BUILD_NUMBER}"
-                //                     git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
-                //                 '''
-                //             }
-                //         }
-                //     }
-                // }
-                // stage("product-service build"){
-                //     when { changeset "product-service/**" }
-                //     steps {
-                //         sh "cd product-service && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
-                //         sh 'echo pushing package to github container registry...'
-                //         sh "docker push ghcr.io/adminseeker/product-service:${BUILD_NUMBER}"
-                //         sh 'cd ..'
-                //         sh 'updating kubernetes manifest file...'
-                //         script{
-                //             withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                //                 sh '''
-                //                     git config user.email "aravind.arali@gmail.com"
-                //                     git config user.name "adminseeker"
-                //                     BUILD_NUMBER=${BUILD_NUMBER}
-                //                     GIT_USER_NAME=adminseeker
-                //                     GIT_REPO_NAME=seeker-store
-                //                     sed -i "s+ghcr.io/adminseeker/product-service.*+ghcr.io/adminseeker/product-service:$BUILD_NUMBER+g" kubernetes/dev/services/productservice.yml
-                //                     git add kubernetes/dev/services/productservice.yml
-                //                     git commit -m "Update product-service image to version ${BUILD_NUMBER}"
-                //                     git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
-                //                 '''
-                //             }
-                //         }
-                //     }
-                // }
-                // stage("inventory-service build"){
-                //     when { changeset "inventory-service/**" }
-                //     steps {
-                //         sh "cd inventory-service && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
-                //         sh 'echo pushing package to github container registry...'
-                //         sh "docker push ghcr.io/adminseeker/inventory-service:${BUILD_NUMBER}"
-                //         sh 'cd ..'
-                //         sh 'updating kubernetes manifest file...'
-                //         script{
-                //             withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                //                 sh '''
-                //                     git config user.email "aravind.arali@gmail.com"
-                //                     git config user.name "adminseeker"
-                //                     BUILD_NUMBER=${BUILD_NUMBER}
-                //                     GIT_USER_NAME=adminseeker
-                //                     GIT_REPO_NAME=seeker-store
-                //                     sed -i "s+ghcr.io/adminseeker/inventory-service.*+ghcr.io/adminseeker/inventory-service:$BUILD_NUMBER+g" kubernetes/dev/services/inventoryservice.yml
-                //                     git add kubernetes/dev/services/inventoryservice.yml
-                //                     git commit -m "Update inventory-service image to version ${BUILD_NUMBER}"
-                //                     git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
-                //                 '''
-                //             }
-                //         }
-                //     }
-                // }
-                // stage("cart-service build"){
-                //     when { changeset "cart-service/**" }
-                //     steps {
-                //         sh "cd cart-service && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
-                //         sh 'echo pushing package to github container registry...'
-                //         sh "docker push ghcr.io/adminseeker/cart-service:${BUILD_NUMBER}"
-                //         sh 'cd ..'
-                //         sh 'updating kubernetes manifest file...'
-                //         script{
-                //             withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                //                 sh '''
-                //                     git config user.email "aravind.arali@gmail.com"
-                //                     git config user.name "adminseeker"
-                //                     BUILD_NUMBER=${BUILD_NUMBER}
-                //                     GIT_USER_NAME=adminseeker
-                //                     GIT_REPO_NAME=seeker-store
-                //                     sed -i "s+ghcr.io/adminseeker/cart-service.*+ghcr.io/adminseeker/cart-service:$BUILD_NUMBER+g" kubernetes/dev/services/cartservice.yml
-                //                     git add kubernetes/dev/services/cartservice.yml
-                //                     git commit -m "Update cart-service image to version ${BUILD_NUMBER}"
-                //                     git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
-                //                 '''
-                //             }
-                //         }
-                //     }
-                // }
-                // stage("order-service build"){
-                //     when { changeset "order-service/**" }
-                //     steps {
-                //         sh "cd order-service && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
-                //         sh 'echo pushing package to github container registry...'
-                //         sh "docker push ghcr.io/adminseeker/order-service:${BUILD_NUMBER}"
-                //         sh 'cd ..'
-                //         sh 'updating kubernetes manifest file...'
-                //         script{
-                //             withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                //                 sh '''
-                //                     git config user.email "aravind.arali@gmail.com"
-                //                     git config user.name "adminseeker"
-                //                     BUILD_NUMBER=${BUILD_NUMBER}
-                //                     GIT_USER_NAME=adminseeker
-                //                     GIT_REPO_NAME=seeker-store
-                //                     sed -i "s+ghcr.io/adminseeker/order-service.*+ghcr.io/adminseeker/order-service:$BUILD_NUMBER+g" kubernetes/dev/services/orderservice.yml
-                //                     git add kubernetes/dev/services/orderservice.yml
-                //                     git commit -m "Update order-service image to version ${BUILD_NUMBER}"
-                //                     git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
-                //                 '''
-                //             }
-                //         }
-                //     }
-                // }
-                // stage("gateway-server build"){
-                //     when { changeset "gateway-server/**" }
-                //     steps {
-                //         sh "cd gateway-server && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
-                //         sh 'echo pushing package to github container registry...'
-                //         sh "docker push ghcr.io/adminseeker/gateway-server:${BUILD_NUMBER}"
-                //         sh 'cd ..'
-                //         sh 'updating kubernetes manifest file...'
-                //         script{
-                //             withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                //                 sh '''
-                //                     git config user.email "aravind.arali@gmail.com"
-                //                     git config user.name "adminseeker"
-                //                     BUILD_NUMBER=${BUILD_NUMBER}
-                //                     GIT_USER_NAME=adminseeker
-                //                     GIT_REPO_NAME=seeker-store
-                //                     sed -i "s+ghcr.io/adminseeker/gateway-server.*+ghcr.io/adminseeker/gateway-server:$BUILD_NUMBER+g" kubernetes/dev/services/gatewayserver.yml
-                //                     git add kubernetes/dev/services/gatewayserver.yml
-                //                     git commit -m "Update gateway-server image to version ${BUILD_NUMBER}"
-                //                     git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
-                //                 '''
-                //             }
-                //         }
-                //     }
-                // }
-                // stage("config-service build"){
-                //     when { changeset "config-service/**" }
-                //     steps {
-                //         sh "cd config-service && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
-                //         sh 'echo pushing package to github container registry...'
-                //         sh "docker push ghcr.io/adminseeker/config-service:${BUILD_NUMBER}"
-                //         sh 'cd ..'
-                //         sh 'updating kubernetes manifest file...'
-                //         script{
-                //             withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                //                 sh '''
-                //                     git config user.email "aravind.arali@gmail.com"
-                //                     git config user.name "adminseeker"
-                //                     BUILD_NUMBER=${BUILD_NUMBER}
-                //                     GIT_USER_NAME=adminseeker
-                //                     GIT_REPO_NAME=seeker-store
-                //                     sed -i "s+ghcr.io/adminseeker/config-service.*+ghcr.io/adminseeker/config-service:$BUILD_NUMBER+g" kubernetes/dev/services/configservice.yml
-                //                     git add kubernetes/dev/services/configservice.yml
-                //                     git commit -m "Update config-service image to version ${BUILD_NUMBER}"
-                //                     git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
-                //                 '''
-                //             }
-                //         }
-                //     }
-                // }
-                // stage("eureka-server build"){
-                //     when { changeset "eureka-server/**" }
-                //     steps {
-                //         sh "cd eureka-server && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
-                //         sh 'echo pushing package to github container registry...'
-                //         sh "docker push ghcr.io/adminseeker/eureka-server:${BUILD_NUMBER}"
-                //         sh 'cd ..'
-                //         sh 'updating kubernetes manifest file...'
-                //         script{
-                //             withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                //                 sh '''
-                //                     git config user.email "aravind.arali@gmail.com"
-                //                     git config user.name "adminseeker"
-                //                     BUILD_NUMBER=${BUILD_NUMBER}
-                //                     GIT_USER_NAME=adminseeker
-                //                     GIT_REPO_NAME=seeker-store
-                //                     sed -i "s+ghcr.io/adminseeker/eureka-server.*+ghcr.io/adminseeker/eureka-server:$BUILD_NUMBER+g" kubernetes/dev/services/eurekaserver.yml
-                //                     git add kubernetes/dev/services/eurekaserver.yml
-                //                     git commit -m "Update eureka-server image to version ${BUILD_NUMBER}"
-                //                     git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
-                //                 '''
-                //             }
-                //         }
-                //     }
-                // }   
-            
+                stage("auth-service build"){
+                    when { changeset "auth-service/**" }
+                    steps {
+                        sh "cd auth-service && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
+                        sh 'echo pushing package to github container registry...'
+                        sh "docker push ghcr.io/adminseeker/auth-service:${BUILD_NUMBER}"
+                        sh 'cd ..'
+                    }
+                }
+                stage('Update Kubernetes Manifest File'){
+                    when { changeset "auth-service/**" }
+                    steps {
+                        script{
+                            withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                                sh '''
+                                    git config user.email "aravind.arali@gmail.com"
+                                    git config user.name "adminseeker"
+                                    BUILD_NUMBER=${BUILD_NUMBER}
+                                    GIT_USER_NAME=adminseeker
+                                    GIT_REPO_NAME=seeker-store
+                                    sed -i "s+ghcr.io/adminseeker/auth-service.*+ghcr.io/adminseeker/auth-service:$BUILD_NUMBER+g" kubernetes/dev/services/authservice.yml
+                                    git add kubernetes/dev/services/authservice.yml
+                                    git commit -m "Updated auth-service image to version ${BUILD_NUMBER}"
+                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
+                                '''
+                            }
+                        }
+                    }
+                }
+                stage("product-service build"){
+                    when { changeset "product-service/**" }
+                    steps {
+                        sh "cd product-service && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
+                        sh 'echo pushing package to github container registry...'
+                        sh "docker push ghcr.io/adminseeker/product-service:${BUILD_NUMBER}"
+                        sh 'cd ..'
+                    }
+                }
+                stage('Update Kubernetes Manifest File'){
+                    when { changeset "product-service/**" }
+                    steps {
+                        script{
+                            withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                                sh '''
+                                    git config user.email "aravind.arali@gmail.com"
+                                    git config user.name "adminseeker"
+                                    BUILD_NUMBER=${BUILD_NUMBER}
+                                    GIT_USER_NAME=adminseeker
+                                    GIT_REPO_NAME=seeker-store
+                                    sed -i "s+ghcr.io/adminseeker/product-service.*+ghcr.io/adminseeker/product-service:$BUILD_NUMBER+g" kubernetes/dev/services/productservice.yml
+                                    git add kubernetes/dev/services/productservice.yml
+                                    git commit -m "Updated product-service image to version ${BUILD_NUMBER}"
+                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
+                                '''
+                            }
+                        }
+                    }
+                }
+                stage("inventory-service build"){
+                    when { changeset "inventory-service/**" }
+                    steps {
+                        sh "cd inventory-service && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
+                        sh 'echo pushing package to github container registry...'
+                        sh "docker push ghcr.io/adminseeker/inventory-service:${BUILD_NUMBER}"
+                        sh 'cd ..'
+                    }
+                }
+                stage('Update Kubernetes Manifest File'){
+                    when { changeset "inventory-service/**" }
+                    steps {
+                        script{
+                            withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                                sh '''
+                                    git config user.email "aravind.arali@gmail.com"
+                                    git config user.name "adminseeker"
+                                    BUILD_NUMBER=${BUILD_NUMBER}
+                                    GIT_USER_NAME=adminseeker
+                                    GIT_REPO_NAME=seeker-store
+                                    sed -i "s+ghcr.io/adminseeker/inventory-service.*+ghcr.io/adminseeker/inventory-service:$BUILD_NUMBER+g" kubernetes/dev/services/inventoryservice.yml
+                                    git add kubernetes/dev/services/inventoryservice.yml
+                                    git commit -m "Updated inventory-service image to version ${BUILD_NUMBER}"
+                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
+                                '''
+                            }
+                        }
+                    }
+                }
+                stage("cart-service build"){
+                    when { changeset "cart-service/**" }
+                    steps {
+                        sh "cd cart-service && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
+                        sh 'echo pushing package to github container registry...'
+                        sh "docker push ghcr.io/adminseeker/cart-service:${BUILD_NUMBER}"
+                        sh 'cd ..'
+                    }
+                }
+                stage('Update Kubernetes Manifest File'){
+                    when { changeset "cart-service/**" }
+                    steps {
+                        script{
+                            withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                                sh '''
+                                    git config user.email "aravind.arali@gmail.com"
+                                    git config user.name "adminseeker"
+                                    BUILD_NUMBER=${BUILD_NUMBER}
+                                    GIT_USER_NAME=adminseeker
+                                    GIT_REPO_NAME=seeker-store
+                                    sed -i "s+ghcr.io/adminseeker/cart-service.*+ghcr.io/adminseeker/cart-service:$BUILD_NUMBER+g" kubernetes/dev/services/cartservice.yml
+                                    git add kubernetes/dev/services/cartservice.yml
+                                    git commit -m "Updated cart-service image to version ${BUILD_NUMBER}"
+                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
+                                '''
+                            }
+                        }
+                    }
+                }
+                stage("order-service build"){
+                    when { changeset "order-service/**" }
+                    steps {
+                        sh "cd order-service && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
+                        sh 'echo pushing package to github container registry...'
+                        sh "docker push ghcr.io/adminseeker/order-service:${BUILD_NUMBER}"
+                        sh 'cd ..'
+                    }
+                }
+                stage('Update Kubernetes Manifest File'){
+                    when { changeset "order-service/**" }
+                    steps {
+                        script{
+                            withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                                sh '''
+                                    git config user.email "aravind.arali@gmail.com"
+                                    git config user.name "adminseeker"
+                                    BUILD_NUMBER=${BUILD_NUMBER}
+                                    GIT_USER_NAME=adminseeker
+                                    GIT_REPO_NAME=seeker-store
+                                    sed -i "s+ghcr.io/adminseeker/order-service.*+ghcr.io/adminseeker/order-service:$BUILD_NUMBER+g" kubernetes/dev/services/orderservice.yml
+                                    git add kubernetes/dev/services/orderservice.yml
+                                    git commit -m "Updated order-service image to version ${BUILD_NUMBER}"
+                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
+                                '''
+                            }
+                        }
+                    }
+                }
+                stage("gateway-server build"){
+                    when { changeset "gateway-server/**" }
+                    steps {
+                        sh "cd gateway-server && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
+                        sh 'echo pushing package to github container registry...'
+                        sh "docker push ghcr.io/adminseeker/gateway-server:${BUILD_NUMBER}"
+                        sh 'cd ..'
+                    }
+                }
+                stage('Update Kubernetes Manifest File'){
+                    when { changeset "gateway-server/**" }
+                    steps {
+                        script{
+                            withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                                sh '''
+                                    git config user.email "aravind.arali@gmail.com"
+                                    git config user.name "adminseeker"
+                                    BUILD_NUMBER=${BUILD_NUMBER}
+                                    GIT_USER_NAME=adminseeker
+                                    GIT_REPO_NAME=seeker-store
+                                    sed -i "s+ghcr.io/adminseeker/gateway-server.*+ghcr.io/adminseeker/gateway-server:$BUILD_NUMBER+g" kubernetes/dev/services/gatewayserver.yml
+                                    git add kubernetes/dev/services/gatewayserver.yml
+                                    git commit -m "Updated gateway-server image to version ${BUILD_NUMBER}"
+                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
+                                '''
+                            }
+                        }
+                    }
+                }
+                stage("config-service build"){
+                    when { changeset "config-service/**" }
+                    steps {
+                        sh "cd config-service && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
+                        sh 'echo pushing package to github container registry...'
+                        sh "docker push ghcr.io/adminseeker/config-service:${BUILD_NUMBER}"
+                        sh 'cd ..'
+                    }
+                }
+                stage('Update Kubernetes Manifest File'){
+                    when { changeset "config-service/**" }
+                    steps {
+                        script{
+                            withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                                sh '''
+                                    git config user.email "aravind.arali@gmail.com"
+                                    git config user.name "adminseeker"
+                                    BUILD_NUMBER=${BUILD_NUMBER}
+                                    GIT_USER_NAME=adminseeker
+                                    GIT_REPO_NAME=seeker-store
+                                    sed -i "s+ghcr.io/adminseeker/config-service.*+ghcr.io/adminseeker/config-service:$BUILD_NUMBER+g" kubernetes/dev/services/configservice.yml
+                                    git add kubernetes/dev/services/configservice.yml
+                                    git commit -m "Updated config-service image to version ${BUILD_NUMBER}"
+                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
+                                '''
+                            }
+                        }
+                    }
+                }
+                stage("eureka-server build"){
+                    when { changeset "eureka-server/**" }
+                    steps {
+                        sh "cd eureka-server && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
+                        sh 'echo pushing package to github container registry...'
+                        sh "docker push ghcr.io/adminseeker/eureka-server:${BUILD_NUMBER}"
+                        sh 'cd ..'
+                    }
+                }
+                stage('Update Kubernetes Manifest File'){
+                    when { changeset "eureka-server/**" }
+                    steps {
+                        script{
+                            withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                                sh '''
+                                    git config user.email "aravind.arali@gmail.com"
+                                    git config user.name "adminseeker"
+                                    BUILD_NUMBER=${BUILD_NUMBER}
+                                    GIT_USER_NAME=adminseeker
+                                    GIT_REPO_NAME=seeker-store
+                                    sed -i "s+ghcr.io/adminseeker/eureka-server.*+ghcr.io/adminseeker/eureka-server:$BUILD_NUMBER+g" kubernetes/dev/services/eurekaserver.yml
+                                    git add kubernetes/dev/services/eurekaserver.yml
+                                    git commit -m "Updated eureka-server image to version ${BUILD_NUMBER}"
+                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
+                                '''
+                            }
+                        }
+                    }
+                }   
             }
         }
     }
