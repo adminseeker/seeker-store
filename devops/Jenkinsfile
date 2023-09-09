@@ -24,7 +24,7 @@ pipeline {
                         // sh "docker push ghcr.io/adminseeker/user-service:${BUILD_NUMBER}"
                         // sh 'cd ..'
                         // sh 'updating kubernetes manifest file...'
-                        withCredentials([string(credentialsId: 'github-secret-as-username-password', variable: 'GITHUB_TOKEN')]) {
+                        withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                             sh '''
                                 git config user.email "aravind.arali@gmail.com"
                                 git config user.name "adminseeker"
@@ -34,7 +34,7 @@ pipeline {
                                 sed -i "s+ghcr.io/adminseeker/user-service.*+ghcr.io/adminseeker/user-service:+g${BUILD_NUMBER}" kubernetes/dev/services/userservice.yml
                                 git add kubernetes/dev/services/userservice.yml
                                 git commit -m "Update user-service image to version ${BUILD_NUMBER}"
-                                git push https://${GITHUB_TOKEN}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME dev
+                                git push https://${GITHUB_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME dev
                             '''
                         }
                     }
