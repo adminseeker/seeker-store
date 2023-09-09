@@ -117,7 +117,19 @@ pipeline {
                     }
                 }
                 stage('Push Kubernetes Manifest Files'){
-                    when { changeset "user-service/**" }
+                    when {
+                        anyOf{
+                            changeset "user-service/**" 
+                            changeset "auth-service/**" 
+                            changeset "product-service/**" 
+                            changeset "inventory-service/**" 
+                            changeset "cart-service/**" 
+                            changeset "order-service/**" 
+                            changeset "gateway-server/**" 
+                            changeset "config-service/**" 
+                            changeset "eureka-server/**" 
+                        } 
+                    }
                     steps {
                         script{
                             withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
