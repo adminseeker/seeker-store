@@ -25,7 +25,7 @@ pipeline {
                         sh 'cd ..'
                     }
                 }
-                stage('Update Kubernetes Manifest File'){
+                stage('Update Kubernetes userservice Manifest File'){
                     when { changeset "user-service/**" }
                     steps {
                         script{
@@ -54,7 +54,7 @@ pipeline {
                         sh 'cd ..'
                     }
                 }
-                stage('Update Kubernetes Manifest File'){
+                stage('Update Kubernetes authservice Manifest File'){
                     when { changeset "auth-service/**" }
                     steps {
                         script{
@@ -83,7 +83,7 @@ pipeline {
                         sh 'cd ..'
                     }
                 }
-                stage('Update Kubernetes Manifest File'){
+                stage('Update Kubernetes productservice Manifest File'){
                     when { changeset "product-service/**" }
                     steps {
                         script{
@@ -112,7 +112,7 @@ pipeline {
                         sh 'cd ..'
                     }
                 }
-                stage('Update Kubernetes Manifest File'){
+                stage('Update Kubernetes inventoryservice Manifest File'){
                     when { changeset "inventory-service/**" }
                     steps {
                         script{
@@ -141,7 +141,7 @@ pipeline {
                         sh 'cd ..'
                     }
                 }
-                stage('Update Kubernetes Manifest File'){
+                stage('Update Kubernetes cartservice Manifest File'){
                     when { changeset "cart-service/**" }
                     steps {
                         script{
@@ -170,7 +170,7 @@ pipeline {
                         sh 'cd ..'
                     }
                 }
-                stage('Update Kubernetes Manifest File'){
+                stage('Update Kubernetes orderservice Manifest File'){
                     when { changeset "order-service/**" }
                     steps {
                         script{
@@ -199,7 +199,7 @@ pipeline {
                         sh 'cd ..'
                     }
                 }
-                stage('Update Kubernetes Manifest File'){
+                stage('Update Kubernetes gatewayserver Manifest File'){
                     when { changeset "gateway-server/**" }
                     steps {
                         script{
@@ -228,7 +228,7 @@ pipeline {
                         sh 'cd ..'
                     }
                 }
-                stage('Update Kubernetes Manifest File'){
+                stage('Update Kubernetes configservice Manifest File'){
                     when { changeset "config-service/**" }
                     steps {
                         script{
@@ -257,7 +257,7 @@ pipeline {
                         sh 'cd ..'
                     }
                 }
-                stage('Update Kubernetes Manifest File'){
+                stage('Update Kubernetes eurekaserver Manifest File'){
                     when { changeset "eureka-server/**" }
                     steps {
                         script{
