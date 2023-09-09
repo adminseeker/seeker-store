@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: configservice
-        image: ghcr.io/adminseeker/config-service:53
+        image: ghcr.io/adminseeker/config-service:57
         
         resources:
           requests:
