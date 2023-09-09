@@ -24,18 +24,20 @@ pipeline {
                         sh "docker push ghcr.io/adminseeker/user-service:${BUILD_NUMBER}"
                         sh 'cd ..'
                         sh 'updating kubernetes manifest file...'
-                        withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                            sh '''
-                                git config user.email "aravind.arali@gmail.com"
-                                git config user.name "adminseeker"
-                                BUILD_NUMBER=${BUILD_NUMBER}
-                                GIT_USER_NAME=adminseeker
-                                GIT_REPO_NAME=seeker-store
-                                sed -i "s+ghcr.io/adminseeker/user-service.*+ghcr.io/adminseeker/user-service:$BUILD_NUMBER+g" kubernetes/dev/services/userservice.yml
-                                git add kubernetes/dev/services/userservice.yml
-                                git commit -m "Update user-service image to version ${BUILD_NUMBER}"
-                                git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
-                            '''
+                        script{
+                            withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                                sh '''
+                                    git config user.email "aravind.arali@gmail.com"
+                                    git config user.name "adminseeker"
+                                    BUILD_NUMBER=${BUILD_NUMBER}
+                                    GIT_USER_NAME=adminseeker
+                                    GIT_REPO_NAME=seeker-store
+                                    sed -i "s+ghcr.io/adminseeker/user-service.*+ghcr.io/adminseeker/user-service:$BUILD_NUMBER+g" kubernetes/dev/services/userservice.yml
+                                    git add kubernetes/dev/services/userservice.yml
+                                    git commit -m "Update user-service image to version ${BUILD_NUMBER}"
+                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
+                                '''
+                            }
                         }
                     }
                 }
@@ -47,18 +49,20 @@ pipeline {
                         sh "docker push ghcr.io/adminseeker/auth-service:${BUILD_NUMBER}"
                         sh 'cd ..'
                         sh 'updating kubernetes manifest file...'
-                        withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                            sh '''
-                                git config user.email "aravind.arali@gmail.com"
-                                git config user.name "adminseeker"
-                                BUILD_NUMBER=${BUILD_NUMBER}
-                                GIT_USER_NAME=adminseeker
-                                GIT_REPO_NAME=seeker-store
-                                sed -i "s+ghcr.io/adminseeker/auth-service.*+ghcr.io/adminseeker/auth-service:$BUILD_NUMBER+g" kubernetes/dev/services/authservice.yml
-                                git add kubernetes/dev/services/authservice.yml
-                                git commit -m "Update auth-service image to version ${BUILD_NUMBER}"
-                                git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
-                            '''
+                        script{
+                            withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                                sh '''
+                                    git config user.email "aravind.arali@gmail.com"
+                                    git config user.name "adminseeker"
+                                    BUILD_NUMBER=${BUILD_NUMBER}
+                                    GIT_USER_NAME=adminseeker
+                                    GIT_REPO_NAME=seeker-store
+                                    sed -i "s+ghcr.io/adminseeker/auth-service.*+ghcr.io/adminseeker/auth-service:$BUILD_NUMBER+g" kubernetes/dev/services/authservice.yml
+                                    git add kubernetes/dev/services/authservice.yml
+                                    git commit -m "Update auth-service image to version ${BUILD_NUMBER}"
+                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
+                                '''
+                            }
                         }
                     }
                 }
@@ -70,18 +74,20 @@ pipeline {
                         sh "docker push ghcr.io/adminseeker/product-service:${BUILD_NUMBER}"
                         sh 'cd ..'
                         sh 'updating kubernetes manifest file...'
-                        withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                            sh '''
-                                git config user.email "aravind.arali@gmail.com"
-                                git config user.name "adminseeker"
-                                BUILD_NUMBER=${BUILD_NUMBER}
-                                GIT_USER_NAME=adminseeker
-                                GIT_REPO_NAME=seeker-store
-                                sed -i "s+ghcr.io/adminseeker/product-service.*+ghcr.io/adminseeker/product-service:$BUILD_NUMBER+g" kubernetes/dev/services/productservice.yml
-                                git add kubernetes/dev/services/productservice.yml
-                                git commit -m "Update product-service image to version ${BUILD_NUMBER}"
-                                git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
-                            '''
+                        script{
+                            withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                                sh '''
+                                    git config user.email "aravind.arali@gmail.com"
+                                    git config user.name "adminseeker"
+                                    BUILD_NUMBER=${BUILD_NUMBER}
+                                    GIT_USER_NAME=adminseeker
+                                    GIT_REPO_NAME=seeker-store
+                                    sed -i "s+ghcr.io/adminseeker/product-service.*+ghcr.io/adminseeker/product-service:$BUILD_NUMBER+g" kubernetes/dev/services/productservice.yml
+                                    git add kubernetes/dev/services/productservice.yml
+                                    git commit -m "Update product-service image to version ${BUILD_NUMBER}"
+                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
+                                '''
+                            }
                         }
                     }
                 }
@@ -93,18 +99,20 @@ pipeline {
                         sh "docker push ghcr.io/adminseeker/inventory-service:${BUILD_NUMBER}"
                         sh 'cd ..'
                         sh 'updating kubernetes manifest file...'
-                        withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                            sh '''
-                                git config user.email "aravind.arali@gmail.com"
-                                git config user.name "adminseeker"
-                                BUILD_NUMBER=${BUILD_NUMBER}
-                                GIT_USER_NAME=adminseeker
-                                GIT_REPO_NAME=seeker-store
-                                sed -i "s+ghcr.io/adminseeker/inventory-service.*+ghcr.io/adminseeker/inventory-service:$BUILD_NUMBER+g" kubernetes/dev/services/inventoryservice.yml
-                                git add kubernetes/dev/services/inventoryservice.yml
-                                git commit -m "Update inventory-service image to version ${BUILD_NUMBER}"
-                                git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
-                            '''
+                        script{
+                            withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                                sh '''
+                                    git config user.email "aravind.arali@gmail.com"
+                                    git config user.name "adminseeker"
+                                    BUILD_NUMBER=${BUILD_NUMBER}
+                                    GIT_USER_NAME=adminseeker
+                                    GIT_REPO_NAME=seeker-store
+                                    sed -i "s+ghcr.io/adminseeker/inventory-service.*+ghcr.io/adminseeker/inventory-service:$BUILD_NUMBER+g" kubernetes/dev/services/inventoryservice.yml
+                                    git add kubernetes/dev/services/inventoryservice.yml
+                                    git commit -m "Update inventory-service image to version ${BUILD_NUMBER}"
+                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
+                                '''
+                            }
                         }
                     }
                 }
@@ -116,18 +124,20 @@ pipeline {
                         sh "docker push ghcr.io/adminseeker/cart-service:${BUILD_NUMBER}"
                         sh 'cd ..'
                         sh 'updating kubernetes manifest file...'
-                        withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                            sh '''
-                                git config user.email "aravind.arali@gmail.com"
-                                git config user.name "adminseeker"
-                                BUILD_NUMBER=${BUILD_NUMBER}
-                                GIT_USER_NAME=adminseeker
-                                GIT_REPO_NAME=seeker-store
-                                sed -i "s+ghcr.io/adminseeker/cart-service.*+ghcr.io/adminseeker/cart-service:$BUILD_NUMBER+g" kubernetes/dev/services/cartservice.yml
-                                git add kubernetes/dev/services/cartservice.yml
-                                git commit -m "Update cart-service image to version ${BUILD_NUMBER}"
-                                git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
-                            '''
+                        script{
+                            withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                                sh '''
+                                    git config user.email "aravind.arali@gmail.com"
+                                    git config user.name "adminseeker"
+                                    BUILD_NUMBER=${BUILD_NUMBER}
+                                    GIT_USER_NAME=adminseeker
+                                    GIT_REPO_NAME=seeker-store
+                                    sed -i "s+ghcr.io/adminseeker/cart-service.*+ghcr.io/adminseeker/cart-service:$BUILD_NUMBER+g" kubernetes/dev/services/cartservice.yml
+                                    git add kubernetes/dev/services/cartservice.yml
+                                    git commit -m "Update cart-service image to version ${BUILD_NUMBER}"
+                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
+                                '''
+                            }
                         }
                     }
                 }
@@ -139,18 +149,20 @@ pipeline {
                         sh "docker push ghcr.io/adminseeker/order-service:${BUILD_NUMBER}"
                         sh 'cd ..'
                         sh 'updating kubernetes manifest file...'
-                        withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                            sh '''
-                                git config user.email "aravind.arali@gmail.com"
-                                git config user.name "adminseeker"
-                                BUILD_NUMBER=${BUILD_NUMBER}
-                                GIT_USER_NAME=adminseeker
-                                GIT_REPO_NAME=seeker-store
-                                sed -i "s+ghcr.io/adminseeker/order-service.*+ghcr.io/adminseeker/order-service:$BUILD_NUMBER+g" kubernetes/dev/services/orderservice.yml
-                                git add kubernetes/dev/services/orderservice.yml
-                                git commit -m "Update order-service image to version ${BUILD_NUMBER}"
-                                git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
-                            '''
+                        script{
+                            withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                                sh '''
+                                    git config user.email "aravind.arali@gmail.com"
+                                    git config user.name "adminseeker"
+                                    BUILD_NUMBER=${BUILD_NUMBER}
+                                    GIT_USER_NAME=adminseeker
+                                    GIT_REPO_NAME=seeker-store
+                                    sed -i "s+ghcr.io/adminseeker/order-service.*+ghcr.io/adminseeker/order-service:$BUILD_NUMBER+g" kubernetes/dev/services/orderservice.yml
+                                    git add kubernetes/dev/services/orderservice.yml
+                                    git commit -m "Update order-service image to version ${BUILD_NUMBER}"
+                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
+                                '''
+                            }
                         }
                     }
                 }
@@ -162,18 +174,20 @@ pipeline {
                         sh "docker push ghcr.io/adminseeker/gateway-server:${BUILD_NUMBER}"
                         sh 'cd ..'
                         sh 'updating kubernetes manifest file...'
-                        withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                            sh '''
-                                git config user.email "aravind.arali@gmail.com"
-                                git config user.name "adminseeker"
-                                BUILD_NUMBER=${BUILD_NUMBER}
-                                GIT_USER_NAME=adminseeker
-                                GIT_REPO_NAME=seeker-store
-                                sed -i "s+ghcr.io/adminseeker/gateway-server.*+ghcr.io/adminseeker/gateway-server:$BUILD_NUMBER+g" kubernetes/dev/services/gatewayserver.yml
-                                git add kubernetes/dev/services/gatewayserver.yml
-                                git commit -m "Update gateway-server image to version ${BUILD_NUMBER}"
-                                git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
-                            '''
+                        script{
+                            withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                                sh '''
+                                    git config user.email "aravind.arali@gmail.com"
+                                    git config user.name "adminseeker"
+                                    BUILD_NUMBER=${BUILD_NUMBER}
+                                    GIT_USER_NAME=adminseeker
+                                    GIT_REPO_NAME=seeker-store
+                                    sed -i "s+ghcr.io/adminseeker/gateway-server.*+ghcr.io/adminseeker/gateway-server:$BUILD_NUMBER+g" kubernetes/dev/services/gatewayserver.yml
+                                    git add kubernetes/dev/services/gatewayserver.yml
+                                    git commit -m "Update gateway-server image to version ${BUILD_NUMBER}"
+                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
+                                '''
+                            }
                         }
                     }
                 }
@@ -185,18 +199,20 @@ pipeline {
                         sh "docker push ghcr.io/adminseeker/config-service:${BUILD_NUMBER}"
                         sh 'cd ..'
                         sh 'updating kubernetes manifest file...'
-                        withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                            sh '''
-                                git config user.email "aravind.arali@gmail.com"
-                                git config user.name "adminseeker"
-                                BUILD_NUMBER=${BUILD_NUMBER}
-                                GIT_USER_NAME=adminseeker
-                                GIT_REPO_NAME=seeker-store
-                                sed -i "s+ghcr.io/adminseeker/config-service.*+ghcr.io/adminseeker/config-service:$BUILD_NUMBER+g" kubernetes/dev/services/configservice.yml
-                                git add kubernetes/dev/services/configservice.yml
-                                git commit -m "Update config-service image to version ${BUILD_NUMBER}"
-                                git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
-                            '''
+                        script{
+                            withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                                sh '''
+                                    git config user.email "aravind.arali@gmail.com"
+                                    git config user.name "adminseeker"
+                                    BUILD_NUMBER=${BUILD_NUMBER}
+                                    GIT_USER_NAME=adminseeker
+                                    GIT_REPO_NAME=seeker-store
+                                    sed -i "s+ghcr.io/adminseeker/config-service.*+ghcr.io/adminseeker/config-service:$BUILD_NUMBER+g" kubernetes/dev/services/configservice.yml
+                                    git add kubernetes/dev/services/configservice.yml
+                                    git commit -m "Update config-service image to version ${BUILD_NUMBER}"
+                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
+                                '''
+                            }
                         }
                     }
                 }
@@ -208,18 +224,20 @@ pipeline {
                         sh "docker push ghcr.io/adminseeker/eureka-server:${BUILD_NUMBER}"
                         sh 'cd ..'
                         sh 'updating kubernetes manifest file...'
-                        withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                            sh '''
-                                git config user.email "aravind.arali@gmail.com"
-                                git config user.name "adminseeker"
-                                BUILD_NUMBER=${BUILD_NUMBER}
-                                GIT_USER_NAME=adminseeker
-                                GIT_REPO_NAME=seeker-store
-                                sed -i "s+ghcr.io/adminseeker/eureka-server.*+ghcr.io/adminseeker/eureka-server:$BUILD_NUMBER+g" kubernetes/dev/services/eurekaserver.yml
-                                git add kubernetes/dev/services/eurekaserver.yml
-                                git commit -m "Update eureka-server image to version ${BUILD_NUMBER}"
-                                git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
-                            '''
+                        script{
+                            withCredentials([usernamePassword(credentialsId: 'github-secret-as-username-password', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+                                sh '''
+                                    git config user.email "aravind.arali@gmail.com"
+                                    git config user.name "adminseeker"
+                                    BUILD_NUMBER=${BUILD_NUMBER}
+                                    GIT_USER_NAME=adminseeker
+                                    GIT_REPO_NAME=seeker-store
+                                    sed -i "s+ghcr.io/adminseeker/eureka-server.*+ghcr.io/adminseeker/eureka-server:$BUILD_NUMBER+g" kubernetes/dev/services/eurekaserver.yml
+                                    git add kubernetes/dev/services/eurekaserver.yml
+                                    git commit -m "Update eureka-server image to version ${BUILD_NUMBER}"
+                                    git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
+                                '''
+                            }
                         }
                     }
                 }   
