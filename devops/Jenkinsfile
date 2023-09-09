@@ -35,7 +35,7 @@ pipeline {
                                 sed -i "s+ghcr.io/adminseeker/user-service.*+ghcr.io/adminseeker/user-service:$BUILD_NUMBER+g" kubernetes/dev/services/userservice.yml
                                 git add kubernetes/dev/services/userservice.yml
                                 git commit -m "Update user-service image to version ${BUILD_NUMBER}"
-                                git push https://${GITHUB_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
+                                git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/$GIT_USER_NAME/$GIT_REPO_NAME HEAD:dev
                             '''
                         }
                     }
