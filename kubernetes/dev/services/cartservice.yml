@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: cartservice
-        image: ghcr.io/adminseeker/cart-service:51
+        image: ghcr.io/adminseeker/cart-service:53
         
         resources:
           requests:
