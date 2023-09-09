@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: authservice
-        image: ghcr.io/adminseeker/auth-service:51
+        image: ghcr.io/adminseeker/auth-service:53
         
         resources:
           requests:
