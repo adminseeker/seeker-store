@@ -21,6 +21,7 @@ pipeline {
                     steps {
                         sh "cd user-service && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
                         sh 'echo pushing package to github container registry...'
+                        sh "docker tag ghcr.io/adminseeker/user-service:${BUILD_NUMBER} ghcr.io/adminseeker/user-service:latest"
                         sh "docker push ghcr.io/adminseeker/user-service:${BUILD_NUMBER}"
                         sh 'cd ..'
                         sh 'echo updating kubernetes userservice manifest file...'
@@ -33,6 +34,7 @@ pipeline {
                     steps {
                         sh "cd auth-service && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
                         sh 'echo pushing package to github container registry...'
+                        sh "docker tag ghcr.io/adminseeker/auth-service:${BUILD_NUMBER} ghcr.io/adminseeker/auth-service:latest"
                         sh "docker push ghcr.io/adminseeker/auth-service:${BUILD_NUMBER}"
                         sh 'cd ..'
                         sh 'echo updating kubernetes authservice manifest file...'
@@ -44,6 +46,7 @@ pipeline {
                     steps {
                         sh "cd product-service && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
                         sh 'echo pushing package to github container registry...'
+                        sh "docker tag ghcr.io/adminseeker/product-service:${BUILD_NUMBER} ghcr.io/adminseeker/product-service:latest"
                         sh "docker push ghcr.io/adminseeker/product-service:${BUILD_NUMBER}"
                         sh 'cd ..'
                         sh 'echo updating kubernetes productservice manifest file...'
@@ -55,6 +58,7 @@ pipeline {
                     steps {
                         sh "cd inventory-service && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
                         sh 'echo pushing package to github container registry...'
+                        sh "docker tag ghcr.io/adminseeker/inventory-service:${BUILD_NUMBER} ghcr.io/adminseeker/inventory-service:latest"
                         sh "docker push ghcr.io/adminseeker/inventory-service:${BUILD_NUMBER}"
                         sh 'cd ..'
                         sh 'echo updating kubernetes inventoryservice manifest file...'
@@ -66,6 +70,7 @@ pipeline {
                     steps {
                         sh "cd cart-service && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
                         sh 'echo pushing package to github container registry...'
+                        sh "docker tag ghcr.io/adminseeker/cart-service:${BUILD_NUMBER} ghcr.io/adminseeker/cart-service:latest"
                         sh "docker push ghcr.io/adminseeker/cart-service:${BUILD_NUMBER}"
                         sh 'cd ..'
                         sh 'echo updating kubernetes cartservice manifest file...'
@@ -77,6 +82,7 @@ pipeline {
                     steps {
                         sh "cd order-service && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
                         sh 'echo pushing package to github container registry...'
+                        sh "docker tag ghcr.io/adminseeker/order-service:${BUILD_NUMBER} ghcr.io/adminseeker/order-service:latest"
                         sh "docker push ghcr.io/adminseeker/order-service:${BUILD_NUMBER}"
                         sh 'cd ..'
                         sh 'echo updating kubernetes orderservice manifest file...'
@@ -88,6 +94,7 @@ pipeline {
                     steps {
                         sh "cd gateway-server && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
                         sh 'echo pushing package to github container registry...'
+                        sh "docker tag ghcr.io/adminseeker/gateway-server:${BUILD_NUMBER} ghcr.io/adminseeker/gateway-server:latest"
                         sh "docker push ghcr.io/adminseeker/gateway-server:${BUILD_NUMBER}"
                         sh 'cd ..'
                         sh 'echo updating kubernetes gatewayserver manifest file...'
@@ -99,6 +106,7 @@ pipeline {
                     steps {
                         sh "cd config-service && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
                         sh 'echo pushing package to github container registry...'
+                        sh "docker tag ghcr.io/adminseeker/config-service:${BUILD_NUMBER} ghcr.io/adminseeker/config-service:latest"
                         sh "docker push ghcr.io/adminseeker/config-service:${BUILD_NUMBER}"
                         sh 'cd ..'
                         sh 'echo updating kubernetes configservice manifest file...'
@@ -110,6 +118,7 @@ pipeline {
                     steps {
                         sh "cd eureka-server && mvn clean spring-boot:build-image -DskipTests -DimageVersion=${BUILD_NUMBER}"
                         sh 'echo pushing package to github container registry...'
+                        sh "docker tag ghcr.io/adminseeker/eureka-server:${BUILD_NUMBER} ghcr.io/adminseeker/eureka-server:latest"
                         sh "docker push ghcr.io/adminseeker/eureka-server:${BUILD_NUMBER}"
                         sh 'cd ..'
                         sh 'echo updating kubernetes eurekaserver manifest file...'
