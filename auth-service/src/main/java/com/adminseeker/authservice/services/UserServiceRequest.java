@@ -17,6 +17,6 @@ public interface UserServiceRequest {
     @PostMapping("/api/v1/users/inapi/getuser")
     Optional<User> getUserByEmail(@RequestBody EmailRequest request, @RequestHeader Map<String,String> headers);
 
-    @PostMapping("/api/v1/users")
+    @PostMapping("/api/v1/users/inapi")
     Optional<User> registerUser(@RequestBody User user, @RequestHeader Map<String,String> headers);
 }
