@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: orderservice
-        image: ghcr.io/adminseeker/order-service:67
+        image: ghcr.io/adminseeker/order-service:69
         
         resources:
           requests:
