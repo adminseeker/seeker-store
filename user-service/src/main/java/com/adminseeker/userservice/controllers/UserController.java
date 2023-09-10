@@ -34,7 +34,7 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @PostMapping("")
+    @PostMapping("/inapi")
     public ResponseEntity<?> save(@RequestHeader Map<String,String> headers,@RequestBody User user){
         try {
             ResponseEntity<UserResponse> newUser = new ResponseEntity<UserResponse>(userService.addUser(user),HttpStatus.CREATED);
