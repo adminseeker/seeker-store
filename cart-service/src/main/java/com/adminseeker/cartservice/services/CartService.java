@@ -142,7 +142,7 @@ public class CartService {
                 break;
             }
         }
-        if(isItemPresent) throw new ResourceUpdateError("Item Already Exists In The Cart!");
+        // if(isItemPresent) throw new ResourceUpdateError("Item Already Exists In The Cart!");
         
         Boolean isPresent=false;
         for(Item i : items){
