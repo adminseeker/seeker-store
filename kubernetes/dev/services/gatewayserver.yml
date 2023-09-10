@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: gatewayserver
-        image: ghcr.io/adminseeker/gateway-server:59
+        image: ghcr.io/adminseeker/gateway-server:67
         
         resources:
           requests:

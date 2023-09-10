@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: userservice
-        image: ghcr.io/adminseeker/user-service:61
+        image: ghcr.io/adminseeker/user-service:67
         
         resources:
           requests:
