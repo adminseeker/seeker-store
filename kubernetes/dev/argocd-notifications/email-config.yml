@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-notifications-cm
+data:
+  service.email.gmail: |
+    username: $email-username
+    password: $email-password
+    host: smtp.gmail.com
+    port: 465
+    from: $email-username
