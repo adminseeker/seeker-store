@@ -2,3 +2,4 @@
 dev-cache/
 kubernetes/dev/configmap.yml
 kubernetes/dev/ghcr-secret.yml
+kubernetes/dev/argocd-notifications/email-secret.yml
