@@ -11,6 +11,5 @@ import com.adminseeker.productservice.entities.Product;
 public interface ProductRepo extends JpaRepository<Product,Long> {
     Optional<Product> findBySkucode(String skucode);
     Optional<List<Product>> findBySellerId(Long sellerId);
-    Optional<List<Product>> findByCategoryCode(String categoryCode);
-
+    Optional<List<Product>> findByCategoryCodes(String categoryCode);
 }
