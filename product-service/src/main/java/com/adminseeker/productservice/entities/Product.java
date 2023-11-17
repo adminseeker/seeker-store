@@ -41,6 +41,18 @@ public class Product {
     @NotEmpty(message = "Empty value not allowed!")
     private String skucode;
 
+    @Column(name="category_name")
+    @NotEmpty(message = "Empty value not allowed!")
+    private String categoryName;
+
+    @Column(name="category_code")
+    @NotEmpty(message = "Empty value not allowed!")
+    private String categoryCode;
+
+    @Column(name="image_path")
+    @NotEmpty(message = "Empty value not allowed!")
+    private String imagePath;
+
     @Column(name="price")
     @NotNull(message = "Empty value not allowed!")
     private Double price;

@@ -49,6 +49,11 @@ public class ProductService {
         return products;
     }
 
+    public List<Product> getProductsByCategoryCode(String categoryCode,Map<String,String> headers){
+        List<Product> products = repo.findByCategoryCode(categoryCode).orElseThrow(()-> new ResourceNotFound("Products Not Found!"));
+        return products;
+    }
+
     public ProductResponse getProductById(Long id,Map<String,String> headers){
         Product product = repo.findById(id).orElseThrow(()-> new ResourceNotFound("Product Not Found!"));
         User seller = userServiceRequest.getUserByIdPublic(product.getSellerId(),headers).orElseThrow(()-> new ResourceNotFound("Seller Not Found!"));

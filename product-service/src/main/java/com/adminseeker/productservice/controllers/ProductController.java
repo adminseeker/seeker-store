@@ -72,6 +72,17 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/public/category/{categoryCode}")
+    public ResponseEntity<?> getProductByCategory(@RequestHeader Map<String,String> headers,@PathVariable String categoryCode){
+        try {
+            List<Product> products = productService.getProductsByCategoryCode(categoryCode,headers);
+            return new ResponseEntity<List<Product>>(products,HttpStatus.OK);
+        } catch (Exception e) {
+            ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
+            return new ResponseEntity<ErrorResponse>(err,HttpStatus.NOT_FOUND);
+        }
+    }
+
 
     @GetMapping("/public/skucode/{skucode}")
     public ResponseEntity<?> getProductBySkuCode(@RequestHeader Map<String,String> headers,@PathVariable String skucode){

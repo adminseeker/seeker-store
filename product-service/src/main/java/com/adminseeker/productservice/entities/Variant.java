@@ -25,6 +25,22 @@ public class Variant {
     @NotEmpty(message = "Empty value not allowed!")
     private String variantSkucode;
 
+    @Column(name="category_name")
+    @NotEmpty(message = "Empty value not allowed!")
+    private String categoryName;
+
+    @Column(name="category_code")
+    @NotEmpty(message = "Empty value not allowed!")
+    private String categoryCode;
+
+    @Column(name="image_path")
+    @NotEmpty(message = "Empty value not allowed!")
+    private String imagePath;
+
+    @Column(name="description")
+    @NotEmpty(message = "Empty value not allowed!")
+    private String description;
+
     @Column(name="color")
     private String color;
 
