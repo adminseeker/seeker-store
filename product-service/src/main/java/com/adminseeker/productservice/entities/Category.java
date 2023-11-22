@@ -1,10 +1,17 @@
 package com.adminseeker.productservice.entities;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 
@@ -28,6 +35,20 @@ public class Category {
     @NotEmpty(message = "Empty value not allowed!")
     private String categoryCode;
 
-    @Column(name="subCategory")
-    private Category subCategory;
+    @ManyToOne
+    @JoinColumn(name = "parent_id")
+    private Category parentCategory;
+
+    @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Category> subCategories = new ArrayList<>();
+
+    public void addSubcategory(Category subcategory) {
+        subCategories.add(subcategory);
+        subcategory.setParentCategory(this);
+    }
+
+    public void removeSubcategory(Category subcategory) {
+        subCategories.remove(subcategory);
+        subcategory.setParentCategory(null);
+    }
 }

@@ -50,7 +50,7 @@ public class ProductService {
     }
 
     public List<Product> getProductsByCategoryCode(String categoryCode,Map<String,String> headers){
-        List<Product> products = repo.findByCategoryCodes(categoryCode).orElseThrow(()-> new ResourceNotFound("Products Not Found!"));
+        List<Product> products = repo.findAllbyCategoriesCategoryCodeLike(categoryCode).orElseThrow(()-> new ResourceNotFound("Products Not Found!"));
         return products;
     }
 
