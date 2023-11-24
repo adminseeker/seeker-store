@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: productservice
-        image: ghcr.io/adminseeker/product-service:100
+        image: ghcr.io/adminseeker/product-service:102
         
         resources:
           requests:
