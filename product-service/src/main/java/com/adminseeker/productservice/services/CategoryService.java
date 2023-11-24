@@ -5,19 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.adminseeker.productservice.entities.Category;
-import com.adminseeker.productservice.entities.Product;
-import com.adminseeker.productservice.entities.ProductResponse;
 import com.adminseeker.productservice.exceptions.DuplicateResourceException;
-import com.adminseeker.productservice.exceptions.LoginError;
 import com.adminseeker.productservice.exceptions.ResourceNotFound;
 import com.adminseeker.productservice.exceptions.ResourceUpdateError;
-import com.adminseeker.productservice.proxies.EmailRequest;
-import com.adminseeker.productservice.proxies.User;
 import com.adminseeker.productservice.repository.CategoryRepo;
-import com.adminseeker.productservice.repository.ProductRepo;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.transaction.Transactional;
 
@@ -77,7 +70,8 @@ public class CategoryService {
         if(parentCategory==null) throw new ResourceNotFound("Parent Category Not Found!");    
         Category subCategory = getCategoriesById(subCategoryId); 
         if(subCategory==null) throw new ResourceNotFound("Category Not Found!");
-        parentCategory.addSubcategory(subCategory);
+        parentCategory.getSubCategories().add(subCategory);
+        parentCategory.setSubCategories(parentCategory.getSubCategories());
         return repo.save(parentCategory);
     }
 
@@ -86,7 +80,11 @@ public class CategoryService {
         if(parentCategory==null) throw new ResourceNotFound("Parent Category Not Found!");
         Category subCategory = getCategoriesById(subCategoryId);
         if(subCategory==null) throw new ResourceNotFound("Sub Category Not Found!");
-        parentCategory.removeSubcategory(subCategory);
+        parentCategory.getSubCategories().forEach((sc)->{
+            if(sc.getCategoryId().equals(subCategoryId)){
+                parentCategory.getSubCategories().remove(sc);
+            }
+        });
         return repo.save(parentCategory);
     }
 }

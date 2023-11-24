@@ -20,10 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.adminseeker.productservice.entities.Category;
 import com.adminseeker.productservice.entities.ErrorResponse;
-import com.adminseeker.productservice.entities.Product;
-import com.adminseeker.productservice.entities.ProductResponse;
 import com.adminseeker.productservice.services.CategoryService;
-import com.adminseeker.productservice.services.ProductService;
 
 
 @CrossOrigin(maxAge = 3600)

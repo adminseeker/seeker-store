@@ -37,18 +37,18 @@ public class Category {
 
     @ManyToOne
     @JoinColumn(name = "parent_id")
-    private Category parentCategory;
+    private Category parent;
 
-    @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Category> subCategories = new ArrayList<>();
 
-    public void addSubcategory(Category subcategory) {
-        subCategories.add(subcategory);
-        subcategory.setParentCategory(this);
-    }
+    // public void addSubcategory(Category subcategory) {
+    //     subCategories.add(subcategory);
+    //     subcategory.setParent(this);
+    // }
 
-    public void removeSubcategory(Category subcategory) {
-        subCategories.remove(subcategory);
-        subcategory.setParentCategory(null);
-    }
+    // public void removeSubcategory(Category subcategory) {
+    //     subCategories.remove(subcategory);
+    //     subcategory.setParent(null);
+    // }
 }
