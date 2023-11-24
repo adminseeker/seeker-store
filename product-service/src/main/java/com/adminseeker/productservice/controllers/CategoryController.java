@@ -49,7 +49,7 @@ public class CategoryController {
     @PostMapping("/inapi/categories/{parentId}/subcategories")
     public ResponseEntity<?> saveSubCategory(@RequestHeader Map<String,String> headers,@RequestBody Category subCategory, @PathVariable Long parentId ){
         try {
-            Category category= categoryService.addSubCategory(parentId,subCategory);
+            Category category= categoryService.addSubCategory(parentId,subCategory.getCategoryId());
             return new ResponseEntity<Category>(category,HttpStatus.CREATED);
             
         } catch (Exception e) {
