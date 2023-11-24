@@ -70,6 +70,7 @@ public class CategoryService {
         if(parentCategory==null) throw new ResourceNotFound("Parent Category Not Found!");    
         Category subCategory = getCategoriesById(subCategoryId); 
         if(subCategory==null) throw new ResourceNotFound("Category Not Found!");
+        subCategory.setParent(parentCategory);
         List<Category> subCategories = parentCategory.getSubCategories();
         subCategories.add(subCategory);
         parentCategory.setSubCategories(subCategories);
@@ -84,6 +85,7 @@ public class CategoryService {
         List<Category> subCategories = parentCategory.getSubCategories();
         subCategories.forEach((sc)->{
             if(sc.getCategoryId().equals(subCategoryId)){
+                sc.setParent(null);
                 parentCategory.getSubCategories().remove(sc);
             }
         });
