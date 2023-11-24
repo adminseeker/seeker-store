@@ -74,7 +74,7 @@ public class CategoryService {
 
     public Category addSubCategory(Long parentId,Long subCategoryId){
         Category parentCategory = getCategoriesById(parentId);
-        if(parentCategory==null) throw new ResourceNotFound("Parent Category Not Found!");        if(parentCategory==null) throw new ResourceNotFound("Parent Category Not Found!");
+        if(parentCategory==null) throw new ResourceNotFound("Parent Category Not Found!");    
         Category subCategory = getCategoriesById(subCategoryId); 
         if(subCategory==null) throw new ResourceNotFound("Category Not Found!");
         parentCategory.addSubcategory(subCategory);
