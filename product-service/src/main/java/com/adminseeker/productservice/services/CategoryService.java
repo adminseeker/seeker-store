@@ -70,8 +70,9 @@ public class CategoryService {
         if(parentCategory==null) throw new ResourceNotFound("Parent Category Not Found!");    
         Category subCategory = getCategoriesById(subCategoryId); 
         if(subCategory==null) throw new ResourceNotFound("Category Not Found!");
-        parentCategory.getSubCategories().add(subCategory);
-        parentCategory.setSubCategories(parentCategory.getSubCategories());
+        List<Category> subCategories = parentCategory.getSubCategories();
+        subCategories.add(subCategory);
+        parentCategory.setSubCategories(subCategories);
         return repo.save(parentCategory);
     }
 
@@ -80,11 +81,13 @@ public class CategoryService {
         if(parentCategory==null) throw new ResourceNotFound("Parent Category Not Found!");
         Category subCategory = getCategoriesById(subCategoryId);
         if(subCategory==null) throw new ResourceNotFound("Sub Category Not Found!");
-        parentCategory.getSubCategories().forEach((sc)->{
+        List<Category> subCategories = parentCategory.getSubCategories();
+        subCategories.forEach((sc)->{
             if(sc.getCategoryId().equals(subCategoryId)){
                 parentCategory.getSubCategories().remove(sc);
             }
         });
+        parentCategory.setSubCategories(subCategories);
         return repo.save(parentCategory);
     }
 }
