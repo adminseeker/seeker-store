@@ -9,7 +9,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -41,6 +43,10 @@ public class Product {
     @NotEmpty(message = "Empty value not allowed!")
     private String skucode;
 
+    @Column(name="image_path")
+    @NotEmpty(message = "Empty value not allowed!")
+    private String imagePath;
+
     @Column(name="price")
     @NotNull(message = "Empty value not allowed!")
     private Double price;
@@ -51,6 +57,9 @@ public class Product {
 
     @OneToMany(orphanRemoval = true,cascade = CascadeType.ALL)
     private List<Variant> variants;
+
+    @ManyToOne
+    private Category category;
 
     @CreationTimestamp
     private LocalDateTime createdDate;

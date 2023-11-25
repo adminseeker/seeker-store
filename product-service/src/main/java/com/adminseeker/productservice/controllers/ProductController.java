@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.adminseeker.productservice.entities.ErrorResponse;
 import com.adminseeker.productservice.entities.Product;
+import com.adminseeker.productservice.entities.ProductRequest;
 import com.adminseeker.productservice.entities.ProductResponse;
 import com.adminseeker.productservice.services.ProductService;
 
@@ -33,9 +34,9 @@ public class ProductController {
     ProductService productService;
 
     @PostMapping("")
-    public ResponseEntity<?> save(@RequestHeader Map<String,String> headers,@RequestBody Product product ){
+    public ResponseEntity<?> save(@RequestHeader Map<String,String> headers,@RequestBody ProductRequest productRequest ){
         try {
-            Product newProduct = productService.addProduct(product,headers);
+            Product newProduct = productService.addProduct(productRequest,headers);
             return new ResponseEntity<Product>(newProduct,HttpStatus.CREATED);
             
         } catch (Exception e) {
@@ -72,6 +73,17 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/public/category/{categoryCode}")
+    public ResponseEntity<?> getProductByCategory(@RequestHeader Map<String,String> headers,@PathVariable String categoryCode){
+        try {
+            List<Product> products = productService.getProductsByCategoryCode(categoryCode,headers);
+            return new ResponseEntity<List<Product>>(products,HttpStatus.OK);
+        } catch (Exception e) {
+            ErrorResponse err = ErrorResponse.builder().msg(e.getMessage()).build();
+            return new ResponseEntity<ErrorResponse>(err,HttpStatus.NOT_FOUND);
+        }
+    }
+
 
     @GetMapping("/public/skucode/{skucode}")
     public ResponseEntity<?> getProductBySkuCode(@RequestHeader Map<String,String> headers,@PathVariable String skucode){
@@ -85,9 +97,9 @@ public class ProductController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateById(@RequestHeader Map<String,String> headers,@RequestBody Product product, @PathVariable Long id){
+    public ResponseEntity<?> updateById(@RequestHeader Map<String,String> headers,@RequestBody ProductRequest productRequest, @PathVariable Long id){
         try{
-            Product productDb = productService.updateProductById(product, id,headers);
+            Product productDb = productService.updateProductById(productRequest, id,headers);
             return new ResponseEntity<Product>(productDb,HttpStatus.OK);
         }
         catch(Exception e){
