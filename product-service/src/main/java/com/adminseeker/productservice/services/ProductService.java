@@ -4,7 +4,9 @@ package com.adminseeker.productservice.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.adminseeker.productservice.entities.Category;
 import com.adminseeker.productservice.entities.Product;
+import com.adminseeker.productservice.entities.ProductRequest;
 import com.adminseeker.productservice.entities.ProductResponse;
 import com.adminseeker.productservice.exceptions.DuplicateResourceException;
 import com.adminseeker.productservice.exceptions.LoginError;
@@ -27,16 +29,27 @@ public class ProductService {
     ProductRepo repo;
 
     @Autowired
+    CategoryService categoryService;
+
+    @Autowired
     UserServiceRequest userServiceRequest;
 
-    public Product addProduct(Product product,Map<String,String> headers){
+    public Product addProduct(ProductRequest productRequest,Map<String,String> headers){
         EmailRequest emailRequest = EmailRequest.builder().email(headers.get("x-auth-user-email")).build();
-        User user = userServiceRequest.getUserByEmail(emailRequest,headers).orElseThrow(()-> new ResourceNotFound("Seller Not Found!"));
-        product.setSkucode(product.getSkucode().toUpperCase());
-        Product check = repo.findBySkucode(product.getSkucode()).orElse(null); 
-        if (!user.getUserId().equals(product.getSellerId())) throw new LoginError("Unauthorised User!");
+        User user = userServiceRequest.getUserByEmail(emailRequest,headers).orElseThrow(()-> new ResourceNotFound("Seller Not Found!"));        
+        Product check = repo.findBySkucode(productRequest.getSkucode().toUpperCase()).orElse(null); 
+        if (!user.getUserId().equals(productRequest.getSellerId())) throw new LoginError("Unauthorised User!");
         if(!user.getRole().equals("seller")) throw new ResourceUpdateError("Not a Seller!");
         if(check!=null) throw new DuplicateResourceException("Product Skucode Already Exists!");
+        Category category = categoryService.getCategoriesById(productRequest.getCategoryId());
+        Product product = new Product();
+        product.setName(productRequest.getName());
+        product.setDescription(productRequest.getDescription());
+        product.setPrice(productRequest.getPrice());
+        product.setSellerId(productRequest.getSellerId());
+        product.setImagePath(productRequest.getImagePath());
+        product.setSkucode(productRequest.getSkucode().toUpperCase());
+        product.setCategory(category);
         return repo.save(product);
     }
 
@@ -50,7 +63,7 @@ public class ProductService {
     }
 
     public List<Product> getProductsByCategoryCode(String categoryCode,Map<String,String> headers){
-        List<Product> products = repo.findAllByCategoriesCategoryCodeLike(categoryCode).orElseThrow(()-> new ResourceNotFound("Products Not Found!"));
+        List<Product> products = repo.findAllByCategoryCategoryCodeLike(categoryCode).orElseThrow(()-> new ResourceNotFound("Products Not Found!"));
         return products;
     }
 
@@ -72,30 +85,36 @@ public class ProductService {
         return productResponse;
     }
 
-    public Product updateProductById(Product product,Long productId,Map<String,String> headers) throws Exception{
+    public Product updateProductById(ProductRequest productRequest,Long productId,Map<String,String> headers) throws Exception{
         EmailRequest emailRequest = EmailRequest.builder().email(headers.get("x-auth-user-email")).build();
         User user = userServiceRequest.getUserByEmail(emailRequest,headers).orElseThrow(()-> new ResourceNotFound("Seller Not Found!"));
         if(!user.getRole().equals("seller")) throw new ResourceUpdateError("Not a Seller!");
         Product productdb = repo.findById(productId).orElseThrow(()->new ResourceNotFound("Product Not Found!"));
         if (!user.getUserId().equals(productdb.getSellerId())) throw new LoginError("Unauthorised User!");
-        if(product.getSkucode()!=null){
-            product.setSkucode(product.getSkucode().toUpperCase());
-            Product check = repo.findBySkucode(product.getSkucode()).orElse(null);
+      
+        if(productRequest.getSkucode()!=null){
+            productRequest.setSkucode(productRequest.getSkucode().toUpperCase());
+            Product check = repo.findBySkucode(productRequest.getSkucode()).orElse(null);
             if(check!=null) throw new DuplicateResourceException("Product Skucode Already Exists!");
-            productdb.setSkucode(product.getSkucode());
+            productdb.setSkucode(productRequest.getSkucode());
         }
-        if(product.getSkucode()==null && product.getName()==null && product.getDescription()==null && product.getPrice()==null) throw new Exception("Nothing to update!");
+        if(productRequest.getSkucode()==null && productRequest.getName()==null && productRequest.getDescription()==null && productRequest.getPrice()==null && productRequest.getCategoryId()==null) throw new Exception("Nothing to update!");
         
-        if(product.getName()!=null){
-            productdb.setName(product.getName());
+        if(productRequest.getName()!=null){
+            productdb.setName(productRequest.getName());
         }
 
-        if(product.getDescription()!=null){
-            productdb.setDescription(product.getDescription());
+        if(productRequest.getDescription()!=null){
+            productdb.setDescription(productRequest.getDescription());
         }
 
-        if(product.getPrice()!=null){
-            productdb.setPrice(product.getPrice());
+        if(productRequest.getPrice()!=null){
+            productdb.setPrice(productRequest.getPrice());
+        }
+
+        if(productRequest.getCategoryId()!=null){
+            Category category = categoryService.getCategoriesById(productRequest.getCategoryId());
+            productdb.setCategory(category);
         }
         return repo.save(productdb);
     }
@@ -108,6 +127,7 @@ public class ProductService {
         if(!user.getRole().equals("seller")) throw new ResourceUpdateError("Not a Seller!");
         Product product = repo.findById(productId).orElseThrow(()-> new ResourceNotFound("Product Not Found!"));
         if (!user.getUserId().equals(product.getSellerId())) throw new LoginError("Unauthorised User!");
+        product.setCategory(null);
         repo.delete(product);
         return product;        
     }

@@ -50,7 +50,7 @@ public class CategoryService {
         if(category.getCategoryCode()!=null){
             category.setCategoryCode(category.getCategoryCode().toUpperCase());
             Category check = repo.findByCategoryCode(category.getCategoryCode()).orElse(null);
-            if(check!=null) throw new DuplicateResourceException("Category Code Already Exists!");
+            if(check!=null && !check.getCategoryId().equals(categoryId)) throw new DuplicateResourceException("Category Code Already Exists!");
             categorydb.setCategoryCode(category.getCategoryCode());
         }
         if(category.getCategoryName()!=null){
@@ -66,10 +66,9 @@ public class CategoryService {
     }
 
     public Category addSubCategory(Long parentId,Long subCategoryId){
-        Category parentCategory = getCategoriesById(parentId);
-        if(parentCategory==null) throw new ResourceNotFound("Parent Category Not Found!");    
-        Category subCategory = getCategoriesById(subCategoryId); 
-        if(subCategory==null) throw new ResourceNotFound("Category Not Found!");
+        if (parentId.equals(subCategoryId)) throw new ResourceUpdateError("parent category and subcategory cannot be same");
+        Category parentCategory = repo.findById(parentId).orElseThrow(()-> new ResourceNotFound("Parent Category Not Found!"));
+        Category subCategory = repo.findById(subCategoryId).orElseThrow(()-> new ResourceNotFound("Category Not Found!")); 
         subCategory.setParent(parentCategory);
         List<Category> subCategories = parentCategory.getSubCategories();
         subCategories.add(subCategory);
@@ -78,18 +77,15 @@ public class CategoryService {
     }
 
     public Category removeSubCategory(Long parentId,Long subCategoryId){
-        Category parentCategory = getCategoriesById(parentId); 
-        if(parentCategory==null) throw new ResourceNotFound("Parent Category Not Found!");
-        Category subCategory = getCategoriesById(subCategoryId);
-        if(subCategory==null) throw new ResourceNotFound("Sub Category Not Found!");
+        Category parentCategory = repo.findById(parentId).orElseThrow(()-> new ResourceNotFound("Parent Category Not Found!"));
+        Category subCategory = repo.findById(subCategoryId).orElseThrow(()-> new ResourceNotFound("Category Not Found!")); 
         List<Category> subCategories = parentCategory.getSubCategories();
-        subCategories.forEach((sc)->{
-            if(sc.getCategoryId().equals(subCategoryId)){
+        for(Category sc: subCategories){
+            if(sc.getCategoryId().equals(subCategory.getCategoryId())){
                 sc.setParent(null);
-                parentCategory.getSubCategories().remove(sc);
+                break;
             }
-        });
-        parentCategory.setSubCategories(subCategories);
-        return repo.save(parentCategory);
+        }
+        return subCategory;
     }
 }

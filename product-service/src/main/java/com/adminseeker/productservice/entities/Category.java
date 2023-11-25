@@ -15,6 +15,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import lombok.Data;
 
 @Data
@@ -37,18 +40,11 @@ public class Category {
 
     @ManyToOne
     @JoinColumn(name = "parent_id")
+    @JsonBackReference
     private Category parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Category> subCategories = new ArrayList<>();
 
-    // public void addSubcategory(Category subcategory) {
-    //     subCategories.add(subcategory);
-    //     subcategory.setParent(this);
-    // }
-
-    // public void removeSubcategory(Category subcategory) {
-    //     subCategories.remove(subcategory);
-    //     subcategory.setParent(null);
-    // }
 }
